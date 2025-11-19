@@ -18,9 +18,9 @@ import {
   AlertDialogTrigger
 } from '@/components/ui/alert-dialog';
 
-interface Table {
+interface Room {
   _id: string | any;
-  tableNumber: number;
+  roomNumber: string;
   qrCodeUrl: string;
   qrCodeData: string;
   status: string;
@@ -30,81 +30,81 @@ interface Table {
 }
 
 export default function QRManagement() {
-  const [tables, setTables] = useState<Table[]>([]);
+  const [rooms, setRooms] = useState<Room[]>([]);
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [newTableNumber, setNewTableNumber] = useState('');
+  const [newRoomNumber, setNewRoomNumber] = useState('');
 
   useEffect(() => {
-    fetchTables();
+    fetchRooms();
   }, []);
 
-  const fetchTables = async () => {
+  const fetchRooms = async () => {
     try {
-      const response = await fetch('/api/tables');
+      const response = await fetch('/api/rooms');
       const data = await response.json();
       if (data.success) {
-        setTables(data.data);
+        setRooms(data.data);
       }
     } catch (error) {
-      console.error('Failed to fetch tables:', error);
+      console.error('Failed to fetch rooms:', error);
     } finally {
       setLoading(false);
     }
   };
 
-  const createTable = async () => {
-    if (!newTableNumber.trim()) return;
+  const createRoom = async () => {
+    if (!newRoomNumber.trim()) return;
 
     setCreating(true);
     try {
-      const response = await fetch('/api/tables', {
+      const response = await fetch('/api/rooms', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          tableNumber: parseInt(newTableNumber),
+          roomNumber: newRoomNumber.trim(),
         }),
       });
 
       const data = await response.json();
       if (data.success) {
-        setTables([...tables, data.data]);
-        setNewTableNumber('');
+        setRooms([...rooms, data.data]);
+        setNewRoomNumber('');
         setIsDialogOpen(false);
       } else {
         alert(data.message);
       }
     } catch (error) {
-      console.error('Failed to create table:', error);
-      alert('Failed to create table');
+      console.error('Failed to create room:', error);
+      alert('Failed to create room');
     } finally {
       setCreating(false);
     }
   };
 
-  const downloadQR = (tableNumber: number, qrData: string) => {
+  const downloadQR = (roomNumber: string, qrData: string) => {
     const link = document.createElement('a');
     link.href = qrData;
-    link.download = `table-${tableNumber}-qr.png`;
+    link.download = `room-${roomNumber}-qr.png`;
     link.click();
   };
 
-  const regenerateQR = async (tableId: string) => {
+  const regenerateQR = async (roomId: string) => {
     try {
-      const response = await fetch('/api/tables', {
+      const response = await fetch('/api/rooms', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ tableId, regenerateQR: true }),
+        body: JSON.stringify({ roomId: roomId, regenerateQR: true }),
       });
 
       const data = await response.json();
       if (data.success) {
-        setTables(tables.map(table => table._id === tableId ? data.data : table));
+        setRooms(rooms.map(room => room._id === roomId ? data.data : room));
       } else {
         alert(data.message);
       }
@@ -114,18 +114,18 @@ export default function QRManagement() {
     }
   };
 
-  const deleteTable = async (tableId: string) => {
+  const deleteRoom = async (roomId: string) => {
     try {
-      const response = await fetch(`/api/tables?id=${tableId}`, { method: 'DELETE' });
+      const response = await fetch(`/api/rooms?id=${roomId}`, { method: 'DELETE' });
       const data = await response.json();
       if (data.success) {
-        setTables(tables.filter(table => table._id !== tableId));
+        setRooms(rooms.filter(room => room._id !== roomId));
       } else {
         alert(data.message);
       }
     } catch (error) {
-      console.error('Failed to delete table:', error);
-      alert('Failed to delete table');
+      console.error('Failed to delete room:', error);
+      alert('Failed to delete room');
     }
   };
 
@@ -137,13 +137,13 @@ export default function QRManagement() {
             <h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight bg-gradient-to-r from-orange-600 via-amber-600 to-orange-500 bg-clip-text text-transparent">
               QR Code Management
             </h1>
-            <p className="text-gray-600 mt-2">Generate and manage QR codes for tables and menus</p>
+            <p className="text-gray-600 mt-2">Generate and manage QR codes for rooms and menus</p>
             <div className="mt-6 h-1 w-full bg-gradient-to-r from-transparent via-orange-400 to-transparent rounded-full opacity-50"></div>
           </div>
           <div className="mt-6 rounded-2xl border-2 border-orange-200/50 bg-white/70 backdrop-blur-md shadow-lg p-6">
             <div className="text-center py-12 sm:py-16">
               <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-orange-200 border-t-orange-600 mb-4"></div>
-              <p className="text-gray-600 text-base sm:text-lg font-medium">Loading tables...</p>
+              <p className="text-gray-600 text-base sm:text-lg font-medium">Loading rooms...</p>
             </div>
           </div>
         </div>
@@ -162,7 +162,7 @@ export default function QRManagement() {
               <h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight bg-gradient-to-r from-orange-600 via-amber-600 to-orange-500 bg-clip-text text-transparent">
                 QR Code Management
               </h1>
-              <p className="text-gray-600 mt-2">Generate and manage QR codes for tables and menus</p>
+              <p className="text-gray-600 mt-2">Generate and manage QR codes for rooms and menus</p>
             </div>
           </div>
 
@@ -170,43 +170,43 @@ export default function QRManagement() {
             <DialogTrigger asChild>
               <Button className="gap-2 w-full sm:w-auto lg:w-auto bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 text-white shadow-lg">
                 <Plus size={20} />
-                Add Table
+                Add Room
               </Button>
             </DialogTrigger>
             <DialogContent className="max-w-sm sm:max-w-md rounded-2xl border-2 border-orange-200/60 bg-white/80 backdrop-blur-xl shadow-2xl">
               <DialogHeader>
                 <DialogTitle className="font-extrabold bg-gradient-to-r from-orange-600 to-amber-600 bg-clip-text text-transparent">
-                  Add New Table
+                  Add New Room
                 </DialogTitle>
                 <DialogDescription className="text-gray-600">
-                  Enter a table number to create a new table with an automatically generated QR code.
+                  Enter a room number to create a new room with an automatically generated QR code.
                 </DialogDescription>
               </DialogHeader>
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="tableNumber" className="text-gray-800">Table Number</Label>
+                  <Label htmlFor="roomNumber" className="text-gray-800">Room Number</Label>
                   <Input
-                    id="tableNumber"
-                    type="number"
-                    value={newTableNumber}
-                    onChange={(e) => setNewTableNumber(e.target.value)}
-                    placeholder="Enter table number"
+                    id="roomNumber"
+                    type="text"
+                    value={newRoomNumber}
+                    onChange={(e) => setNewRoomNumber(e.target.value)}
+                    placeholder="Enter room number"
                     className="border-orange-200 bg-white/70 backdrop-blur-sm focus-visible:ring-orange-500"
                   />
                 </div>
-                <Button onClick={createTable} disabled={creating} className="w-full bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 text-white shadow-lg">
-                  {creating ? 'Creating...' : 'Create Table'}
+                <Button onClick={createRoom} disabled={creating} className="w-full bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 text-white shadow-lg">
+                  {creating ? 'Creating...' : 'Create Room'}
                 </Button>
               </div>
             </DialogContent>
           </Dialog>
         </div>
 
-        {/* Table Cards */}
+        {/* Room Cards */}
         <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 w-full">
-          {tables.map((table) => (
+          {rooms.map((room) => (
             <div
-              key={table._id}
+              key={room._id}
               className="rounded-2xl border-2 border-orange-200/50 bg-gradient-to-br from-white to-orange-50/20 backdrop-blur-sm shadow-lg p-4 sm:p-6 flex flex-col justify-between hover:shadow-2xl transition-all"
             >
               <div className="flex flex-wrap justify-between items-center mb-4 gap-3">
@@ -215,37 +215,37 @@ export default function QRManagement() {
                     <QrCode size={20} />
                   </div>
                   <h3 className="text-lg font-extrabold bg-gradient-to-r from-orange-700 to-amber-700 bg-clip-text text-transparent">
-                    Table {table.tableNumber}
+                    Room {room.roomNumber}
                   </h3>
                 </div>
                 <span
                   className={`px-3 py-1 rounded-full text-xs font-semibold border ${
-                    table.status === 'available'
+                    room.status === 'available'
                       ? 'bg-emerald-100 text-emerald-800 border-emerald-200'
                       : 'bg-rose-100 text-rose-800 border-rose-200'
                   }`}
                 >
-                  {table.status}
+                  {room.status}
                 </span>
               </div>
 
               <div className="flex justify-center mb-4">
                 <img
-                  src={table.qrCodeData}
-                  alt={`QR Code for Table ${table.tableNumber}`}
+                  src={room.qrCodeData}
+                  alt={`QR Code for Room ${room.roomNumber}`}
                   className="w-28 h-28 sm:w-32 sm:h-32 object-contain rounded-lg border border-orange-100 bg-white/60"
                 />
               </div>
 
               <div className="text-center space-y-3">
-                <p className="text-sm text-gray-700 break-all px-2">{table.qrCodeUrl}</p>
+                <p className="text-sm text-gray-700 break-all px-2">{room.qrCodeUrl}</p>
 
                 {/* Responsive Button Group */}
                 <div className="flex flex-wrap gap-2 justify-center">
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => regenerateQR(table._id)}
+                    onClick={() => regenerateQR(room._id)}
                     className="flex-1 min-w-[100px] sm:min-w-[120px] gap-2 border-orange-300 text-orange-700 hover:text-white hover:bg-gradient-to-r hover:from-orange-600 hover:to-amber-600"
                   >
                     <RefreshCw size={16} />
@@ -255,7 +255,7 @@ export default function QRManagement() {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => downloadQR(table.tableNumber, table.qrCodeData)}
+                    onClick={() => downloadQR(room.roomNumber, room.qrCodeData)}
                     className="flex-1 min-w-[100px] sm:min-w-[120px] gap-2 border-orange-300 text-orange-700 hover:text-white hover:bg-gradient-to-r hover:from-orange-600 hover:to-amber-600"
                   >
                     <Download size={16} />
@@ -275,15 +275,15 @@ export default function QRManagement() {
                     </AlertDialogTrigger>
                     <AlertDialogContent className="rounded-2xl border-2 border-red-200 bg-white/80 backdrop-blur-md">
                       <AlertDialogHeader>
-                        <AlertDialogTitle className="font-bold text-gray-900">Delete Table</AlertDialogTitle>
+                        <AlertDialogTitle className="font-bold text-gray-900">Delete Room</AlertDialogTitle>
                         <AlertDialogDescription className="text-gray-700">
-                          Are you sure you want to delete Table {table.tableNumber}? This action cannot be undone and will permanently remove the table and its QR code.
+                          Are you sure you want to delete Room {room.roomNumber}? This action cannot be undone and will permanently remove the room and its QR code.
                         </AlertDialogDescription>
                       </AlertDialogHeader>
                       <AlertDialogFooter>
                         <AlertDialogCancel className="border-gray-300">Cancel</AlertDialogCancel>
                         <AlertDialogAction
-                          onClick={() => deleteTable(table._id)}
+                          onClick={() => deleteRoom(room._id)}
                           className="bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700 text-white"
                         >
                           Delete
@@ -297,9 +297,9 @@ export default function QRManagement() {
           ))}
         </div>
 
-        {tables.length === 0 && (
+        {rooms.length === 0 && (
           <div className="mt-6 rounded-2xl border-2 border-orange-200/50 bg-white/70 backdrop-blur-md p-6 text-center shadow-lg">
-            <p className="text-gray-600">No tables found. Add your first table to generate QR codes.</p>
+            <p className="text-gray-600">No rooms found. Add your first room to generate QR codes.</p>
           </div>
         )}
       </div>

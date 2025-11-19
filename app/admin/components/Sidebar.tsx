@@ -8,24 +8,24 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 
 const ORDER_UNREAD_COUNT_STORAGE_KEY = 'adminOrderUnreadCount';
-const TABLE_OCCUPIED_COUNT_STORAGE_KEY = 'adminTableOccupiedCount';
-const TABLE_ASSIGNED_COUNT_STORAGE_KEY = 'adminTableAssignedCount';
+const ROOM_OCCUPIED_COUNT_STORAGE_KEY = 'adminRoomOccupiedCount';
+const ROOM_ASSIGNED_COUNT_STORAGE_KEY = 'adminRoomAssignedCount';
 
 export function Sidebar() {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [orderUnreadCount, setOrderUnreadCount] = useState(0);
-  const [tableOccupiedCount, setTableOccupiedCount] = useState(0);
-  const [tableAssignedCount, setTableAssignedCount] = useState(0);
+  const [roomOccupiedCount, setRoomOccupiedCount] = useState(0);
+  const [roomAssignedCount, setRoomAssignedCount] = useState(0);
 
   const links = [
     { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
     { href: '/admin/orders', label: 'All Orders', icon: ShoppingCart },
-    { href: '/admin/manage-table', label: 'Manage Table', icon: Table2 },
+    { href: '/admin/manage-room', label: 'Manage Room', icon: Table2 },
     { href: '/admin/manage-food', label: 'Manage Food', icon: UtensilsCrossed },
     { href: '/admin/coupon', label: 'Coupons', icon: Ticket },
-    { href: '/admin/qr', label: 'QR Code for Tables', icon: QrCode },
+    { href: '/admin/qr', label: 'QR Code for Rooms', icon: QrCode },
     { href: '/admin/settings', label: 'Settings', icon: Settings },
     { href: '/admin/payment-settings', label: 'Payment Settings', icon: CreditCard },
   ];
@@ -39,15 +39,15 @@ export function Sidebar() {
       const parsed = Number.parseInt(storedOrders, 10);
       setOrderUnreadCount(Number.isNaN(parsed) ? 0 : parsed);
     }
-    const storedTables = window.localStorage.getItem(TABLE_OCCUPIED_COUNT_STORAGE_KEY);
-    if (storedTables !== null) {
-      const parsed = Number.parseInt(storedTables, 10);
-      setTableOccupiedCount(Number.isNaN(parsed) ? 0 : parsed);
+    const storedRooms = window.localStorage.getItem(ROOM_OCCUPIED_COUNT_STORAGE_KEY);
+    if (storedRooms !== null) {
+      const parsed = Number.parseInt(storedRooms, 10);
+      setRoomOccupiedCount(Number.isNaN(parsed) ? 0 : parsed);
     }
-    const storedAssigned = window.localStorage.getItem(TABLE_ASSIGNED_COUNT_STORAGE_KEY);
+    const storedAssigned = window.localStorage.getItem(ROOM_ASSIGNED_COUNT_STORAGE_KEY);
     if (storedAssigned !== null) {
       const parsed = Number.parseInt(storedAssigned, 10);
-      setTableAssignedCount(Number.isNaN(parsed) ? 0 : parsed);
+      setRoomAssignedCount(Number.isNaN(parsed) ? 0 : parsed);
     }
     const handleUnreadUpdate = (event: Event) => {
       const detail = (event as CustomEvent<number>).detail;
@@ -55,25 +55,25 @@ export function Sidebar() {
         setOrderUnreadCount(detail);
       }
     };
-    const handleTableOccupiedUpdate = (event: Event) => {
+    const handleRoomOccupiedUpdate = (event: Event) => {
       const detail = (event as CustomEvent<number>).detail;
       if (typeof detail === 'number') {
-        setTableOccupiedCount(detail);
+        setRoomOccupiedCount(detail);
       }
     };
-    const handleTableAssignedUpdate = (event: Event) => {
+    const handleRoomAssignedUpdate = (event: Event) => {
       const detail = (event as CustomEvent<number>).detail;
       if (typeof detail === 'number') {
-        setTableAssignedCount(detail);
+        setRoomAssignedCount(detail);
       }
     };
     window.addEventListener('admin-order-unread-count', handleUnreadUpdate);
-    window.addEventListener('admin-table-occupied-count', handleTableOccupiedUpdate);
-    window.addEventListener('admin-table-assigned-count', handleTableAssignedUpdate);
+    window.addEventListener('admin-room-occupied-count', handleRoomOccupiedUpdate);
+    window.addEventListener('admin-room-assigned-count', handleRoomAssignedUpdate);
     return () => {
       window.removeEventListener('admin-order-unread-count', handleUnreadUpdate);
-      window.removeEventListener('admin-table-occupied-count', handleTableOccupiedUpdate);
-      window.removeEventListener('admin-table-assigned-count', handleTableAssignedUpdate);
+      window.removeEventListener('admin-room-occupied-count', handleRoomOccupiedUpdate);
+      window.removeEventListener('admin-room-assigned-count', handleRoomAssignedUpdate);
     };
   }, []);
 
@@ -82,9 +82,9 @@ export function Sidebar() {
       return;
     }
     let active = true;
-    const loadTableCounts = async () => {
+    const loadRoomCounts = async () => {
       try {
-        const response = await fetch('/api/tables', { cache: 'no-store' });
+        const response = await fetch('/api/rooms', { cache: 'no-store' });
         if (!response.ok || !active) {
           return;
         }
@@ -96,21 +96,21 @@ export function Sidebar() {
         const occupied = items.filter((item) => item?.status === 'occupied').length;
         const assigned = items.filter((item) => item?.assignedUser).length;
         const badgeCount = Math.max(occupied, assigned);
-        const isOnManageTablePage = window.location.pathname === '/admin/manage-table';
-        const nextAssigned = isOnManageTablePage ? 0 : badgeCount;
-        const nextOccupied = isOnManageTablePage ? 0 : occupied;
-        setTableAssignedCount(nextAssigned);
-        setTableOccupiedCount(nextOccupied);
-        window.localStorage.setItem(TABLE_ASSIGNED_COUNT_STORAGE_KEY, nextAssigned.toString());
-        window.localStorage.setItem(TABLE_OCCUPIED_COUNT_STORAGE_KEY, nextOccupied.toString());
-        window.dispatchEvent(new CustomEvent('admin-table-assigned-count', { detail: nextAssigned }));
-        window.dispatchEvent(new CustomEvent('admin-table-occupied-count', { detail: nextOccupied }));
+        const isOnManageRoomPage = window.location.pathname === '/admin/manage-room';
+        const nextAssigned = isOnManageRoomPage ? 0 : badgeCount;
+        const nextOccupied = isOnManageRoomPage ? 0 : occupied;
+        setRoomAssignedCount(nextAssigned);
+        setRoomOccupiedCount(nextOccupied);
+        window.localStorage.setItem(ROOM_ASSIGNED_COUNT_STORAGE_KEY, nextAssigned.toString());
+        window.localStorage.setItem(ROOM_OCCUPIED_COUNT_STORAGE_KEY, nextOccupied.toString());
+        window.dispatchEvent(new CustomEvent('admin-room-assigned-count', { detail: nextAssigned }));
+        window.dispatchEvent(new CustomEvent('admin-room-occupied-count', { detail: nextOccupied }));
       } catch (error) {
-        console.error('Error loading table counts', error);
+        console.error('Error loading room counts', error);
       }
     };
-    loadTableCounts();
-    const intervalId = window.setInterval(loadTableCounts, 5000);
+    loadRoomCounts();
+    const intervalId = window.setInterval(loadRoomCounts, 5000);
     return () => {
       active = false;
       window.clearInterval(intervalId);
@@ -141,33 +141,33 @@ export function Sidebar() {
     setOrderUnreadCount(0);
   }, []);
 
-  const resetTableBadge = useCallback(() => {
+  const resetRoomBadge = useCallback(() => {
     if (typeof window !== 'undefined') {
-      window.localStorage.setItem(TABLE_OCCUPIED_COUNT_STORAGE_KEY, '0');
-      window.localStorage.setItem(TABLE_ASSIGNED_COUNT_STORAGE_KEY, '0');
-      window.dispatchEvent(new CustomEvent('admin-table-occupied-count', { detail: 0 }));
-      window.dispatchEvent(new CustomEvent('admin-table-assigned-count', { detail: 0 }));
+      window.localStorage.setItem(ROOM_OCCUPIED_COUNT_STORAGE_KEY, '0');
+      window.localStorage.setItem(ROOM_ASSIGNED_COUNT_STORAGE_KEY, '0');
+      window.dispatchEvent(new CustomEvent('admin-room-occupied-count', { detail: 0 }));
+      window.dispatchEvent(new CustomEvent('admin-room-assigned-count', { detail: 0 }));
     }
-    setTableOccupiedCount(0);
-    setTableAssignedCount(0);
+    setRoomOccupiedCount(0);
+    setRoomAssignedCount(0);
   }, []);
 
   useEffect(() => {
     if (pathname === '/admin/orders') {
       resetOrderBadge();
     }
-    if (pathname === '/admin/manage-table') {
-      resetTableBadge();
+    if (pathname === '/admin/manage-room') {
+      resetRoomBadge();
     }
-  }, [pathname, resetOrderBadge, resetTableBadge]);
+  }, [pathname, resetOrderBadge, resetRoomBadge]);
 
   const handleOrdersLinkClick = () => {
     resetOrderBadge();
     handleLinkClick();
   };
 
-  const handleManageTableLinkClick = () => {
-    resetTableBadge();
+  const handleManageRoomLinkClick = () => {
+    resetRoomBadge();
     handleLinkClick();
   };
 
@@ -244,12 +244,12 @@ export function Sidebar() {
           {links.map(({ href, label, icon: Icon }) => {
             const isActive = pathname === href;
             const isOrdersLink = href === '/admin/orders';
-            const isManageTableLink = href === '/admin/manage-table';
+            const isManageRoomLink = href === '/admin/manage-room';
             const orderBadgeValue = orderUnreadCount > 9 ? '9+' : orderUnreadCount.toString();
-            const tableBadgeCount = tableAssignedCount > 0 ? tableAssignedCount : tableOccupiedCount;
-            const tableBadgeValue = tableBadgeCount > 9 ? '9+' : tableBadgeCount.toString();
+            const roomBadgeCount = roomAssignedCount > 0 ? roomAssignedCount : roomOccupiedCount;
+            const roomBadgeValue = roomBadgeCount > 9 ? '9+' : roomBadgeCount.toString();
             const showOrderBadge = isOrdersLink && orderUnreadCount > 0;
-            const showTableBadge = isManageTableLink && tableBadgeCount > 0;
+            const showRoomBadge = isManageRoomLink && roomBadgeCount > 0;
             return (
               <Link
                 key={href}
@@ -257,8 +257,8 @@ export function Sidebar() {
                 onClick={() => {
                   if (isOrdersLink) {
                     handleOrdersLinkClick();
-                  } else if (isManageTableLink) {
-                    handleManageTableLinkClick();
+                  } else if (isManageRoomLink) {
+                    handleManageRoomLinkClick();
                   } else {
                     handleLinkClick();
                   }
@@ -278,9 +278,9 @@ export function Sidebar() {
                       {orderBadgeValue}
                     </span>
                   ) : null}
-                  {isCollapsed && showTableBadge ? (
+                  {isCollapsed && showRoomBadge ? (
                     <span className="absolute -top-1 -right-1 inline-flex h-4 min-w-[1rem] items-center justify-center rounded-full bg-orange-500 px-1 text-[10px] font-medium text-white">
-                      {tableBadgeValue}
+                      {roomBadgeValue}
                     </span>
                   ) : null}
                 </div>
@@ -292,9 +292,9 @@ export function Sidebar() {
                         {orderBadgeValue}
                       </span>
                     ) : null}
-                    {showTableBadge ? (
+                    {showRoomBadge ? (
                       <span className="ml-3 inline-flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-orange-500 px-2 text-xs font-medium text-white">
-                        {tableBadgeValue}
+                        {roomBadgeValue}
                       </span>
                     ) : null}
                   </span>

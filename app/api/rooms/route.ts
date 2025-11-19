@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import QRCode from 'qrcode';
 import connectDB from '@/lib/mongodb';
-import Table from '@/models/Table';
+import Room from '@/models/Room';
 import User from '@/models/User';
 
 export async function POST(request: NextRequest) {
@@ -9,35 +9,36 @@ export async function POST(request: NextRequest) {
     await connectDB();
 
     const body = await request.json();
-    const { tableNumber, restaurantId } = body;
+    const { roomNumber, restaurantId } = body;
 
-    if (!tableNumber) {
+    if (!roomNumber) {
       return NextResponse.json(
         {
           success: false,
-          message: 'Missing required fields: tableNumber is required',
+          message: 'Missing required fields: roomNumber is required',
         },
         { status: 400 }
       );
     }
 
-    // Check if table already exists
-    const existingTable = await Table.findOne({ tableNumber });
-    if (existingTable) {
+    // Check if room already exists
+    const existingRoom = await Room.findOne({ roomNumber });
+    if (existingRoom) {
       return NextResponse.json(
         {
           success: false,
-          message: 'Table with this number already exists',
+          message: 'Room with this number already exists',
         },
         { status: 409 }
       );
     }
 
-    const qrUrl = `https://food-menu-beige.vercel.app/order?table=${tableNumber}`;
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://lotus-palace.vercel.app';
+    const qrUrl = `${baseUrl}/order?room=${roomNumber}`;
 
-    // Create table first without QR code
-    const table = await Table.create({
-      tableNumber,
+    // Create room first without QR code
+    const room = await Room.create({
+      roomNumber,
       qrCodeUrl: qrUrl,
       qrCodeData: '', // Will be updated after QR generation
       ...(restaurantId && { restaurantId }),
@@ -55,9 +56,9 @@ export async function POST(request: NextRequest) {
         }
       });
 
-      // Update table with QR code data
-      table.qrCodeData = qrCodeData;
-      await table.save();
+      // Update room with QR code data
+      room.qrCodeData = qrCodeData;
+      await room.save();
     } catch (qrError: any) {
       console.error('Failed to generate QR code:', qrError);
       // Don't fail the request, just continue without QR code
@@ -66,8 +67,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       {
         success: true,
-        message: 'Table created successfully with QR code',
-        data: table,
+        message: 'Room created successfully with QR code',
+        data: room,
       },
       { status: 201 }
     );
@@ -94,23 +95,23 @@ export async function GET(request: NextRequest) {
       filter.restaurantId = restaurantId;
     }
 
-    const tables = await Table.find(filter)
-      .sort({ tableNumber: 1 })
+    const rooms = await Room.find(filter)
+      .sort({ roomNumber: 1 })
       .populate('assignedUser', 'name phone email')
       .populate('currentOrder')
       .populate('orderHistory');
 
     return NextResponse.json({
       success: true,
-      count: tables.length,
-      data: tables,
+      count: rooms.length,
+      data: rooms,
     });
   } catch (error: any) {
-    console.error('GET /api/tables - Error:', error);
+    console.error('GET /api/rooms - Error:', error);
     return NextResponse.json(
       {
         success: false,
-        message: error.message || 'Failed to fetch tables',
+        message: error.message || 'Failed to fetch rooms',
       },
       { status: 500 }
     );
@@ -122,24 +123,24 @@ export async function PUT(request: NextRequest) {
     await connectDB();
 
     const body = await request.json();
-    const { tableId, status, regenerateQR = false } = body;
+    const { roomId, status, regenerateQR = false } = body;
 
-    if (!tableId) {
+    if (!roomId) {
       return NextResponse.json(
         {
           success: false,
-          message: 'Table ID is required',
+          message: 'Room ID is required',
         },
         { status: 400 }
       );
     }
 
-    const table = await Table.findById(tableId);
-    if (!table) {
+    const room = await Room.findById(roomId);
+    if (!room) {
       return NextResponse.json(
         {
           success: false,
-          message: 'Table not found',
+          message: 'Room not found',
         },
         { status: 404 }
       );
@@ -147,25 +148,26 @@ export async function PUT(request: NextRequest) {
 
     // Update status if provided
     if (status) {
-      table.status = status;
+      room.status = status;
     }
 
     if (status === 'available') {
-      table.assignedUser = null;
-      table.currentOrder = null;
+      room.assignedUser = null;
+      room.currentOrder = null;
 
-      // Clear tableNumber from all users who were assigned to this table
-      if (table.tableNumber) {
+      // Clear roomNumber from all users who were assigned to this room
+      if (room.roomNumber) {
         await User.updateMany(
-          { tableNumber: table.tableNumber },
-          { $unset: { tableNumber: 1 } }
+          { roomNumber: room.roomNumber },
+          { $unset: { roomNumber: 1 } }
         );
       }
     }
 
     // Regenerate QR code if requested
     if (regenerateQR) {
-      const qrUrl = `https://food-menu-beige.vercel.app/order?table=${table.tableNumber}`;
+      const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://lotus-palace.vercel.app';
+      const qrUrl = `${baseUrl}/order?room=${room.roomNumber}`;
 
       try {
         const qrCodeData = await QRCode.toDataURL(qrUrl, {
@@ -177,9 +179,9 @@ export async function PUT(request: NextRequest) {
           }
         });
 
-        // Update table with new QR code
-        table.qrCodeUrl = qrUrl;
-        table.qrCodeData = qrCodeData;
+        // Update room with new QR code
+        room.qrCodeUrl = qrUrl;
+        room.qrCodeData = qrCodeData;
       } catch (qrError: any) {
         console.error('Failed to regenerate QR code:', qrError);
         return NextResponse.json(
@@ -192,13 +194,13 @@ export async function PUT(request: NextRequest) {
       }
     }
 
-    await table.save();
+    await room.save();
 
     return NextResponse.json(
       {
         success: true,
-        message: regenerateQR ? 'QR code regenerated successfully' : 'Table updated successfully',
-        data: table,
+        message: regenerateQR ? 'QR code regenerated successfully' : 'Room updated successfully',
+        data: room,
       },
       { status: 200 }
     );
@@ -206,7 +208,7 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json(
       {
         success: false,
-        message: error.message || 'Failed to update table',
+        message: error.message || 'Failed to update room',
       },
       { status: 500 }
     );
@@ -230,23 +232,23 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    const table = await Table.findById(tableId);
-    if (!table) {
+    const room = await Room.findById(tableId);
+    if (!room) {
       return NextResponse.json(
         {
           success: false,
-          message: 'Table not found',
+          message: 'Room not found',
         },
         { status: 404 }
       );
     }
 
-    await Table.findByIdAndDelete(tableId);
+    await Room.findByIdAndDelete(tableId);
 
     return NextResponse.json(
       {
         success: true,
-        message: 'Table deleted successfully',
+        message: 'Room deleted successfully',
       },
       { status: 200 }
     );
@@ -254,7 +256,7 @@ export async function DELETE(request: NextRequest) {
     return NextResponse.json(
       {
         success: false,
-        message: error.message || 'Failed to delete table',
+        message: error.message || 'Failed to delete room',
       },
       { status: 500 }
     );

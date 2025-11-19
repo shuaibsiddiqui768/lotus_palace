@@ -3,7 +3,7 @@ import crypto from 'crypto';
 import connectDB from '@/lib/mongodb';
 import User from '@/models/User';
 import Order from '@/models/Order';
-import Table from '@/models/Table';
+import Table from '@/models/Room';
 
 const SALT_LENGTH = 16;
 const PBKDF2_ITERATIONS = 100000;

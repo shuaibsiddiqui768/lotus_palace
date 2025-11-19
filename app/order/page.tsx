@@ -9,17 +9,17 @@ import { QrCode, ArrowRight } from 'lucide-react';
 export default function OrderPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [tableNumber, setTableNumber] = useState<number | null>(null);
+  const [roomNumber, setRoomNumber] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const updateUserTableNumber = async (tableNum: number) => {
+    const updateUserRoomNumber = async (roomNum: string) => {
       try {
         // Check if user is logged in
         const storedUser = localStorage.getItem('foodhubUser');
         if (storedUser) {
           const user = JSON.parse(storedUser);
-          // Update user's table number using PATCH endpoint
+          // Update user's room number using PATCH endpoint
           const response = await fetch('/api/users', {
             method: 'PATCH',
             headers: {
@@ -28,7 +28,7 @@ export default function OrderPage() {
             body: JSON.stringify({
               email: user.email,
               phone: user.phone,
-              tableNumber: tableNum,
+              roomNumber: roomNum,
             }),
           });
 
@@ -42,30 +42,30 @@ export default function OrderPage() {
           }
         }
       } catch (error) {
-        console.error('Failed to update user table number:', error);
+        console.error('Failed to update user room number:', error);
       }
     };
 
-    const tableParam = searchParams.get('table');
+    const roomParam = searchParams.get('room');
 
-    if (tableParam) {
-      const tableNum = parseInt(tableParam);
-      if (!isNaN(tableNum) && tableNum > 0) {
-        setTableNumber(tableNum);
-        // Store table number in localStorage for later use
-        localStorage.setItem('selectedTableNumber', tableNum.toString());
-        // Update user's table number if logged in
-        updateUserTableNumber(tableNum);
+    if (roomParam) {
+      const roomNum = roomParam.trim();
+      if (roomNum) {
+        setRoomNumber(roomNum);
+        // Store room number in localStorage for later use
+        localStorage.setItem('selectedRoomNumber', roomNum);
+        // Update user's room number if logged in
+        updateUserRoomNumber(roomNum);
         setLoading(false);
       } else {
-        // Invalid table number
+        // Invalid room number
         setLoading(false);
       }
     } else {
-      // No table parameter, check if we have one stored
-      const storedTable = localStorage.getItem('selectedTableNumber');
-      if (storedTable) {
-        setTableNumber(parseInt(storedTable));
+      // No room parameter, check if we have one stored
+      const storedRoom = localStorage.getItem('selectedRoomNumber');
+      if (storedRoom) {
+        setRoomNumber(storedRoom);
       }
       setLoading(false);
     }
@@ -97,11 +97,11 @@ export default function OrderPage() {
           <div className="flex justify-center mb-4">
             <QrCode size={48} className="text-blue-600" />
           </div>
-          <CardTitle className="text-2xl">Welcome to Table {tableNumber}</CardTitle>
+          <CardTitle className="text-2xl">Welcome to Room {roomNumber}</CardTitle>
           <CardDescription>
-            {tableNumber
-              ? `You've been assigned to Table ${tableNumber}. Ready to start ordering?`
-              : 'No table selected. Please scan a QR code from your table.'
+            {roomNumber
+              ? `You've been assigned to Room ${roomNumber}. Ready to start ordering?`
+              : 'No room selected. Please scan a QR code from your room.'
             }
           </CardDescription>
           <div className="mt-4 text-sm text-gray-500">
@@ -114,11 +114,11 @@ export default function OrderPage() {
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          {tableNumber ? (
+          {roomNumber ? (
             <>
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-center">
                 <p className="text-sm text-blue-800">
-                  <strong>Table {tableNumber}</strong> has been assigned to your session.
+                  <strong>Room {roomNumber}</strong> has been assigned to your session.
                 </p>
               </div>
 
@@ -137,7 +137,7 @@ export default function OrderPage() {
             <div className="text-center space-y-4">
               <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
                 <p className="text-sm text-yellow-800">
-                  Please scan a QR code from your table to continue.
+                  Please scan a QR code from your room to continue.
                 </p>
               </div>
 

@@ -13,9 +13,9 @@ interface AssignedUser {
   email?: string;
 }
 
-interface Table {
+interface Room {
   _id: string;
-  tableNumber: number;
+  roomNumber: string;
   status: string;
   qrCodeUrl: string;
   qrCodeData: string;
@@ -32,7 +32,7 @@ interface Order {
   customerPhone: string;
   customerEmail?: string;
   orderType: string;
-  tableNumber: string;
+  roomNumber: string;
   items: any[];
   total: number;
   status: string;
@@ -40,7 +40,7 @@ interface Order {
   updatedAt?: string;
 }
 
-interface TableWithOrder extends Table {
+interface RoomWithOrder extends Room {
   currentOrder?: Order | null;
 }
 
@@ -58,8 +58,8 @@ const broadcastWaiterTableRefresh = () => {
   }
 };
 
-export default function TablesPage() {
-  const [tables, setTables] = useState<TableWithOrder[]>([]);
+export default function RoomsPage() {
+  const [rooms, setRooms] = useState<RoomWithOrder[]>([]);
   const [loading, setLoading] = useState(true);
   const [lastRefresh, setLastRefresh] = useState<Date>(new Date());
   const [refreshing, setRefreshing] = useState(false);
@@ -71,86 +71,86 @@ export default function TablesPage() {
   const fetchTablesRef = useRef<(() => Promise<void>) | null>(null);
   const persistentOrdersRef = useRef<Record<string, Order | undefined>>({});
 
-  const computeSnapshot = useCallback((tableList: TableWithOrder[]) => {
+  const computeSnapshot = useCallback((roomList: RoomWithOrder[]) => {
     return JSON.stringify(
-      tableList.map(table => ({
-        id: table._id,
-        status: table.status,
-        orderId: table.currentOrder?._id || null,
+      roomList.map(room => ({
+        id: room._id,
+        status: room.status,
+        orderId: room.currentOrder?._id || null,
       }))
     );
   }, []);
 
-  const fetchTables = useCallback(async ({ showLoading = true }: FetchTablesOptions = {}) => {
+  const fetchRooms = useCallback(async ({ showLoading = true }: FetchTablesOptions = {}) => {
     if (showLoading) {
       setLoading(true);
     }
 
     try {
-      const tablesResponse = await fetch('/api/tables');
-      const tablesData = await tablesResponse.json();
+      const roomsResponse = await fetch('/api/rooms');
+      const roomsData = await roomsResponse.json();
 
-      if (!tablesData.success) {
-        throw new Error('Failed to fetch tables');
+      if (!roomsData.success) {
+        throw new Error('Failed to fetch rooms');
       }
 
       const ordersResponse = await fetch('/api/orders', { cache: 'no-store' });
       const ordersData = await ordersResponse.json();
 
-      const dineInOrders: Order[] = (ordersData.success ? ordersData.data : [])
-        .filter((order: Order) => order.orderType === 'dine-in')
+      const roomOrders: Order[] = (ordersData.success ? ordersData.data : [])
+        .filter((order: Order) => order.orderType === 'Rooms')
         .sort((a: Order, b: Order) => {
           const aTime = new Date(a.updatedAt ?? a.createdAt).getTime();
           const bTime = new Date(b.updatedAt ?? b.createdAt).getTime();
           return bTime - aTime;
         });
 
-      const latestOrderByTableNumber: Partial<Record<string, Order>> = {};
-      dineInOrders.forEach((order) => {
-        const tableKey = order.tableNumber.toString();
-        const existing = latestOrderByTableNumber[tableKey];
+      const latestOrderByRoomNumber: Partial<Record<string, Order>> = {};
+      roomOrders.forEach((order) => {
+        const roomKey = order.roomNumber;
+        const existing = latestOrderByRoomNumber[roomKey];
         const orderTime = new Date(order.updatedAt ?? order.createdAt).getTime();
         const existingTime = existing ? new Date(existing.updatedAt ?? existing.createdAt).getTime() : -Infinity;
 
         if (!existing || orderTime >= existingTime) {
-          latestOrderByTableNumber[tableKey] = order;
+          latestOrderByRoomNumber[roomKey] = order;
         }
       });
 
-      const tablesWithOrders: TableWithOrder[] = tablesData.data.map((table: Table) => {
-        const tableKey = table.tableNumber.toString();
-        const persistedOrder = persistentOrdersRef.current[table._id];
-        const shouldAttachOrders = table.status !== 'available';
+      const roomsWithOrders: RoomWithOrder[] = roomsData.data.map((room: Room) => {
+        const roomKey = room.roomNumber;
+        const persistedOrder = persistentOrdersRef.current[room._id];
+        const shouldAttachOrders = room.status !== 'available';
 
         let currentOrder = shouldAttachOrders
-          ? latestOrderByTableNumber[tableKey] ?? table.currentOrder ?? persistedOrder
+          ? latestOrderByRoomNumber[roomKey] ?? room.currentOrder ?? persistedOrder
           : undefined;
 
         if (shouldAttachOrders && currentOrder) {
           currentOrder = {
             ...persistedOrder,
-            ...table.currentOrder,
+            ...room.currentOrder,
             ...currentOrder,
           };
-          persistentOrdersRef.current[table._id] = currentOrder;
+          persistentOrdersRef.current[room._id] = currentOrder;
         } else {
-          delete persistentOrdersRef.current[table._id];
+          delete persistentOrdersRef.current[room._id];
         }
 
         if (currentOrder && currentOrder.status === 'closed') {
-          delete persistentOrdersRef.current[table._id];
+          delete persistentOrdersRef.current[room._id];
           currentOrder = undefined;
         }
 
-        const derivedStatus = currentOrder || table.assignedUser ? 'occupied' : table.status;
+        const derivedStatus = currentOrder || room.assignedUser ? 'occupied' : room.status;
 
-        return { ...table, status: derivedStatus, currentOrder };
+        return { ...room, status: derivedStatus, currentOrder };
       });
 
-      const snapshot = computeSnapshot(tablesWithOrders);
+      const snapshot = computeSnapshot(roomsWithOrders);
       let shouldBroadcast = false;
       if (snapshot !== lastSnapshotRef.current) {
-        setTables(tablesWithOrders);
+        setRooms(roomsWithOrders);
         lastSnapshotRef.current = snapshot;
         shouldBroadcast = true;
       }
@@ -159,7 +159,7 @@ export default function TablesPage() {
         broadcastWaiterTableRefresh();
       }
     } catch (error) {
-      console.error('Failed to fetch tables:', error);
+      console.error('Failed to fetch rooms:', error);
     } finally {
       if (showLoading) {
         setLoading(false);
@@ -168,16 +168,16 @@ export default function TablesPage() {
   }, [computeSnapshot]);
 
   useEffect(() => {
-    fetchTables({ showLoading: true });
-  }, [fetchTables]);
+    fetchRooms({ showLoading: true });
+  }, [fetchRooms]);
 
   useEffect(() => {
-    fetchTablesRef.current = () => fetchTables({ showLoading: false });
+    fetchTablesRef.current = () => fetchRooms({ showLoading: false });
 
     return () => {
       fetchTablesRef.current = null;
     };
-  }, [fetchTables]);
+  }, [fetchRooms]);
 
   useEffect(() => {
     if (!fetchTablesRef.current) {
@@ -208,56 +208,56 @@ export default function TablesPage() {
         autoRefreshTimeoutRef.current = null;
       }
     };
-  }, [fetchTables]);
+  }, [fetchRooms]);
 
   const handleManualRefresh = async (event: MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
     setRefreshing(true);
-    await fetchTables();
+    await fetchRooms();
     setRefreshing(false);
   };
 
-  const updateTableStatus = async (tableInfo: TableWithOrder, status: string) => {
+  const updateRoomStatus = async (roomInfo: RoomWithOrder, status: string) => {
     try {
       setErrorMessage('');
       setSuccessMessage('');
 
-      const response = await fetch('/api/tables', {
+      const response = await fetch('/api/rooms', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ tableId: tableInfo._id, status }),
+        body: JSON.stringify({ tableId: roomInfo._id, status }),
       });
 
       const data = await response.json();
       if (data.success) {
-        setTables(prevTables => prevTables.map(table => {
-          if (table._id !== tableInfo._id) {
-            return table;
+        setRooms(prevRooms => prevRooms.map(room => {
+          if (room._id !== roomInfo._id) {
+            return room;
           }
 
-          const nextCurrentOrder = status === 'available' ? undefined : (data.data.currentOrder ?? table.currentOrder);
-          const nextAssignedUser = status === 'available' ? undefined : (data.data.assignedUser ?? table.assignedUser);
+          const nextCurrentOrder = status === 'available' ? undefined : (data.data.currentOrder ?? room.currentOrder);
+          const nextAssignedUser = status === 'available' ? undefined : (data.data.assignedUser ?? room.assignedUser);
 
           if (status === 'available') {
-            delete persistentOrdersRef.current[tableInfo._id];
+            delete persistentOrdersRef.current[roomInfo._id];
           }
 
           return {
-            ...table,
+            ...room,
             ...data.data,
             currentOrder: nextCurrentOrder,
             assignedUser: nextAssignedUser,
           };
         }));
-        
-        const statusText = status === 'available' ? 'marked as available' : 'updated';
-        setSuccessMessage(`Table ${tableInfo.tableNumber} ${statusText}`);
 
-        if (status === 'available' && tableInfo.currentOrder) {
+        const statusText = status === 'available' ? 'marked as available' : 'updated';
+        setSuccessMessage(`Room ${roomInfo.roomNumber} ${statusText}`);
+
+        if (status === 'available' && roomInfo.currentOrder) {
           try {
-            await fetch(`/api/orders/${tableInfo.currentOrder._id}`, {
+            await fetch(`/api/orders/${roomInfo.currentOrder._id}`, {
               method: 'PATCH',
               headers: {
                 'Content-Type': 'application/json',
@@ -268,17 +268,17 @@ export default function TablesPage() {
             console.error('Failed to update order status:', orderError);
           }
         }
-        
-        await fetchTables();
+
+        await fetchRooms();
 
         setTimeout(() => setSuccessMessage(''), 3000);
       } else {
-        setErrorMessage(data.message || 'Failed to update table');
+        setErrorMessage(data.message || 'Failed to update room');
         setTimeout(() => setErrorMessage(''), 3000);
       }
     } catch (error) {
-      console.error('Failed to update table status:', error);
-      setErrorMessage('Failed to update table status');
+      console.error('Failed to update room status:', error);
+      setErrorMessage('Failed to update room status');
       setTimeout(() => setErrorMessage(''), 3000);
     }
   };
@@ -288,12 +288,12 @@ export default function TablesPage() {
       <div className="space-y-6">
         <div>
           <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight bg-gradient-to-r from-orange-500 via-orange-600 to-red-500 bg-clip-text text-transparent">
-            Tables Management
+            Rooms Management
           </h1>
-          <p className="text-gray-600 mt-2">Monitor and manage restaurant tables</p>
+          <p className="text-gray-600 mt-2">Monitor and manage hotel rooms</p>
         </div>
         <div className="bg-white/90 backdrop-blur-sm rounded-lg border border-orange-100 p-6">
-          <p className="text-gray-600">Loading tables...</p>
+          <p className="text-gray-600">Loading rooms...</p>
         </div>
       </div>
     );
@@ -305,9 +305,9 @@ export default function TablesPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight bg-gradient-to-r from-orange-500 via-orange-600 to-red-500 bg-clip-text text-transparent">
-            Tables Management
+            Rooms Management
           </h1>
-          <p className="text-gray-600 mt-2">Monitor and manage restaurant tables</p>
+          <p className="text-gray-600 mt-2">Monitor and manage hotel rooms</p>
           <p className="text-xs text-gray-500 mt-1">
             Last updated: {lastRefresh.toLocaleTimeString()}
           </p>
@@ -318,7 +318,7 @@ export default function TablesPage() {
           size="sm"
           disabled={refreshing}
           className="gap-2 hover:border-orange-300 hover:text-orange-700"
-          title="Refresh tables"
+          title="Refresh rooms"
         >
           <RefreshCw size={16} className={refreshing ? 'animate-spin' : ''} />
           {refreshing ? 'Refreshing...' : 'Refresh'}
@@ -339,95 +339,95 @@ export default function TablesPage() {
         </div>
       )}
 
-      {/* Tables grid */}
+      {/* Rooms grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {tables.map((table) => (
-          <Card key={table._id} className="border border-orange-100/70 hover:shadow-lg transition-shadow bg-white/90 backdrop-blur-sm">
+        {rooms.map((room) => (
+          <Card key={room._id} className="border border-orange-100/70 hover:shadow-lg transition-shadow bg-white/90 backdrop-blur-sm">
             <CardHeader>
               <CardTitle className="flex items-center justify-between text-gray-900">
-                Table {table.tableNumber}
+                Room {room.roomNumber}
                 <Badge
                   variant={
-                    table.status === 'occupied'
+                    room.status === 'occupied'
                       ? 'destructive'
-                      : table.status === 'reserved'
+                      : room.status === 'reserved'
                       ? 'secondary'
                       : 'default'
                   }
                   className={
-                    table.status === 'available'
+                    room.status === 'available'
                       ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                      : table.status === 'reserved'
+                      : room.status === 'reserved'
                       ? 'bg-amber-50 text-amber-700 border border-amber-200'
                       : 'bg-red-50 text-red-700 border border-red-200'
                   }
                 >
-                  {table.status}
+                  {room.status}
                 </Badge>
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
-                {table.assignedUser && (
+                {room.assignedUser && (
                   <div className="p-3 bg-emerald-50 rounded-md border border-emerald-200">
                     <div className="flex items-center gap-2 mb-2">
                       <User size={16} className="text-emerald-600" />
                       <span className="text-sm font-medium text-emerald-800">Assigned Guest</span>
                     </div>
                     <div className="text-sm text-gray-700 space-y-1">
-                      <p><strong>Name:</strong> {table.assignedUser.name}</p>
-                      {table.assignedUser.phone && (
-                        <p><strong>Phone:</strong> {table.assignedUser.phone}</p>
+                      <p><strong>Name:</strong> {room.assignedUser.name}</p>
+                      {room.assignedUser.phone && (
+                        <p><strong>Phone:</strong> {room.assignedUser.phone}</p>
                       )}
-                      {table.assignedUser.email && (
-                        <p><strong>Email:</strong> {table.assignedUser.email}</p>
+                      {room.assignedUser.email && (
+                        <p><strong>Email:</strong> {room.assignedUser.email}</p>
                       )}
                     </div>
                   </div>
                 )}
 
-                {table.currentOrder && (
+                {room.currentOrder && (
                   <div className="p-3 bg-orange-50 rounded-md border border-orange-200">
                     <div className="flex items-center gap-2 mb-2">
                       <Users size={16} className="text-orange-600" />
                       <span className="text-sm font-medium text-orange-800">Current Customer</span>
                     </div>
                     <div className="text-sm text-gray-700 space-y-1">
-                      <p><strong>Name:</strong> {table.currentOrder.customerName}</p>
-                      <p><strong>Phone:</strong> {table.currentOrder.customerPhone}</p>
-                      {table.currentOrder.customerEmail && (
-                        <p><strong>Email:</strong> {table.currentOrder.customerEmail}</p>
+                      <p><strong>Name:</strong> {room.currentOrder.customerName}</p>
+                      <p><strong>Phone:</strong> {room.currentOrder.customerPhone}</p>
+                      {room.currentOrder.customerEmail && (
+                        <p><strong>Email:</strong> {room.currentOrder.customerEmail}</p>
                       )}
-                      <p><strong>Order Total:</strong> ₹{table.currentOrder.total}</p>
-                      <p><strong>Order Status:</strong> {table.currentOrder.status}</p>
-                      <p><strong>Items:</strong> {table.currentOrder.items.length}</p>
+                      <p><strong>Order Total:</strong> ₹{room.currentOrder.total}</p>
+                      <p><strong>Order Status:</strong> {room.currentOrder.status}</p>
+                      <p><strong>Items:</strong> {room.currentOrder.items.length}</p>
                     </div>
                   </div>
                 )}
 
-                {!table.currentOrder && table.status === 'available' && (
+                {!room.currentOrder && room.status === 'available' && (
                   <div className="text-sm text-gray-500">
                     No active order
                   </div>
                 )}
 
                 <div className="flex gap-2 mt-4 flex-wrap">
-                  {table.status === 'occupied' && (
+                  {room.status === 'occupied' && (
                     <Button
                       size="sm"
                       variant="destructive"
-                      onClick={() => updateTableStatus(table, 'available')}
-                      title="Mark table as available when customer leaves"
+                      onClick={() => updateRoomStatus(room, 'available')}
+                      title="Mark room as available when customer leaves"
                       className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 border-0"
                     >
-                      Table Free ✓
+                      Room Free ✓
                     </Button>
                   )}
-                  {table.status === 'reserved' && (
+                  {room.status === 'reserved' && (
                     <Button
                       size="sm"
                       variant="default"
-                      onClick={() => updateTableStatus(table, 'available')}
+                      onClick={() => updateRoomStatus(room, 'available')}
                       className="hover:border-orange-300 hover:text-orange-700"
                     >
                       Cancel Reservation
