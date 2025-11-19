@@ -28,7 +28,7 @@ export interface IUser extends Document {
   provider: string;
   cart: IUserCart;
   orderHistory: string[];
-  tableNumber?: number; // Assigned table number from QR scan
+  roomNumber?: string; // Assigned room number from QR scan
   createdAt: Date;
   updatedAt: Date;
 }
@@ -132,9 +132,9 @@ const userSchema = new Schema<IUser>(
         ref: 'Order',
       },
     ],
-    tableNumber: {
-      type: Number,
-      min: 1,
+    roomNumber: {
+      type: String,
+      trim: true,
     },
   },
   {

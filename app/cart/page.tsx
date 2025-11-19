@@ -32,7 +32,7 @@ export default function CartPage() {
   const [orderError, setOrderError] = useState('');
   const previousUserHadAccount = useRef(false);
   const APPLIED_COUPON_STORAGE_KEY = 'cartAppliedCoupon';
-  const SELECTED_TABLE_STORAGE_KEY = 'selectedTableNumber';
+  const SELECTED_ROOM_STORAGE_KEY = 'selectedRoomNumber';
 
   const syncUser = useCallback(() => {
     if (typeof window === 'undefined') {
@@ -55,7 +55,7 @@ export default function CartPage() {
     if (typeof window === 'undefined') {
       return null;
     }
-    const stored = window.localStorage.getItem(SELECTED_TABLE_STORAGE_KEY);
+    const stored = window.localStorage.getItem(SELECTED_ROOM_STORAGE_KEY);
     if (!stored) {
       return null;
     }
@@ -113,7 +113,7 @@ export default function CartPage() {
       if (event.key === 'foodhubUser') {
         syncUser();
       }
-      if (!event.key || event.key === SELECTED_TABLE_STORAGE_KEY) {
+      if (!event.key || event.key === SELECTED_ROOM_STORAGE_KEY) {
         syncRoomFromStorage();
       }
     };
@@ -211,11 +211,16 @@ export default function CartPage() {
     setCustomerName(user.name ?? '');
     setCustomerPhone(user.phone ?? '');
     setCustomerEmail(user.email ?? '');
-  }, [isHydrated, user?.name, user?.phone, user?.email, user, getStoredRoomNumber]);
+    if (user.roomNumber) {
+      setRoomNumber(user.roomNumber.toString());
+    }
+  }, [isHydrated, user?.name, user?.phone, user?.email, user?.roomNumber, user, getStoredRoomNumber]);
 
   useEffect(() => {
-    syncRoomFromStorage();
-  }, [syncRoomFromStorage]);
+    if (isHydrated) {
+      syncRoomFromStorage();
+    }
+  }, [isHydrated, syncRoomFromStorage]);
 
   useEffect(() => {
     if (!isHydrated) {
@@ -575,13 +580,19 @@ export default function CartPage() {
 
                 <form onSubmit={(e) => { e.preventDefault(); handlePlaceOrder(); }} className="space-y-4 mb-6">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Room Number</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Room Number
+                      {user?.roomNumber && <span className="text-xs text-green-600 ml-2">(Auto-filled)</span>}
+                    </label>
                     <input
                       type="text"
                       placeholder="Enter room number"
                       value={roomNumber}
                       onChange={(e) => setRoomNumber(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                      readOnly={!!user?.roomNumber}
+                      className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 ${
+                        user?.roomNumber ? 'bg-gray-100 cursor-not-allowed' : ''
+                      }`}
                       required
                     />
                   </div>
