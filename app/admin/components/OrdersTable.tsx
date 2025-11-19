@@ -152,12 +152,8 @@ export function OrdersTable({ orders, onStatusUpdate }: OrdersTableProps) {
 
   const getOrderTypeColor = (orderType: string) => {
     switch (orderType) {
-      case 'dine-in':
-        return 'bg-emerald-100 text-emerald-800';
-      case 'takeaway':
-        return 'bg-orange-100 text-orange-800';
-      case 'delivery':
-        return 'bg-indigo-100 text-indigo-800';
+      case 'Rooms':
+        return 'bg-blue-100 text-blue-800';
       default:
         return 'bg-gray-100 text-gray-800';
     }
@@ -384,20 +380,10 @@ export function OrdersTable({ orders, onStatusUpdate }: OrdersTableProps) {
 
   const getDisplayInfo = (order: IOrder) => {
     switch (order.orderType) {
-      case 'dine-in':
+      case 'Rooms':
         return {
-          label: `Table ${order.tableNumber}`,
-          icon: '🍽️',
-        };
-      case 'takeaway':
-        return {
-          label: 'Takeaway',
-          icon: '📦',
-        };
-      case 'delivery':
-        return {
-          label: order.deliveryAddress?.substring(0, 30) + '...' || 'Delivery',
-          icon: '🚗',
+          label: `Room ${order.roomNumber}`,
+          icon: '🏨',
         };
       default:
         return { label: 'Unknown', icon: '?' };

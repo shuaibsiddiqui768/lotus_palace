@@ -65,19 +65,17 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     console.log('POST /api/orders - Received body:', JSON.stringify(body, null, 2));
     
-    const { 
+    const {
       userId: providedUserId,
-      customerName, 
-      customerPhone, 
-      customerEmail, 
-      orderType, 
-      tableNumber, 
-      deliveryAddress, 
-      deliveryNotes, 
-      items, 
-      subtotal, 
-      gst, 
-      discountAmount, 
+      customerName,
+      customerPhone,
+      customerEmail,
+      orderType,
+      roomNumber,
+      items,
+      subtotal,
+      gst,
+      discountAmount,
       total,
       couponCode,
       couponId,
@@ -94,8 +92,11 @@ export async function POST(request: NextRequest) {
     if (!customerPhone || typeof customerPhone !== 'string' || customerPhone.trim() === '') {
       errors.push('Customer phone is required and must be a valid string');
     }
-    if (!orderType || !['dine-in', 'takeaway', 'delivery'].includes(orderType)) {
-      errors.push('Valid order type (dine-in, takeaway, delivery) is required');
+    if (!orderType || orderType !== 'Rooms') {
+      errors.push('Order type must be Rooms');
+    }
+    if (!roomNumber || typeof roomNumber !== 'string' || roomNumber.trim() === '') {
+      errors.push('Room number is required and must be a valid string');
     }
     if (!items || !Array.isArray(items) || items.length === 0) {
       errors.push('At least one item is required in the order');
@@ -176,20 +177,17 @@ export async function POST(request: NextRequest) {
         name: customerName,
         phone: customerPhone,
         email: customerEmail || undefined,
-        address: deliveryAddress || undefined,
         orderHistory: [],
       });
       console.log('POST /api/orders - User created:', user._id);
     } else {
       console.log(`POST /api/orders - Found existing user: ${user._id}`);
       // Update user information if needed
-      if (user.name !== customerName || 
-          (customerEmail && user.email !== customerEmail) || 
-          (deliveryAddress && user.address !== deliveryAddress)) {
-        
+      if (user.name !== customerName ||
+          (customerEmail && user.email !== customerEmail)) {
+
         user.name = customerName;
         if (customerEmail) user.email = customerEmail;
-        if (deliveryAddress) user.address = deliveryAddress;
         await user.save();
         console.log('POST /api/orders - User information updated');
       }
@@ -267,9 +265,7 @@ export async function POST(request: NextRequest) {
       customerPhone,
       customerEmail: customerEmail || undefined,
       orderType,
-      tableNumber: orderType === 'dine-in' ? tableNumber : undefined,
-      deliveryAddress: orderType === 'delivery' ? deliveryAddress : undefined,
-      deliveryNotes: orderType === 'delivery' ? deliveryNotes : undefined,
+      roomNumber,
       items: items.map((item: any) => ({
         foodId: item.id,
         name: item.name,

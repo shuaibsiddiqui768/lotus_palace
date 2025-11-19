@@ -16,13 +16,11 @@ export default function CartPage() {
   const router = useRouter();
   const [user, setUser] = useState<any>(null);
   const [isHydrated, setIsHydrated] = useState(false);
-  const [orderType, setOrderType] = useState('dine-in');
+  const orderType = 'Rooms';
   const [customerName, setCustomerName] = useState('');
   const [customerPhone, setCustomerPhone] = useState('');
   const [customerEmail, setCustomerEmail] = useState('');
-  const [tableNumber, setTableNumber] = useState('');
-  const [address, setAddress] = useState('');
-  const [deliveryNotes, setDeliveryNotes] = useState('');
+  const [roomNumber, setRoomNumber] = useState('');
   const [couponCode, setCouponCode] = useState('');
   const [appliedCoupon, setAppliedCoupon] = useState<CouponOption | null>(null);
   const [showCouponModal, setShowCouponModal] = useState(false);
@@ -53,7 +51,7 @@ export default function CartPage() {
     }
   }, []);
 
-  const getStoredTableNumber = useCallback(() => {
+  const getStoredRoomNumber = useCallback(() => {
     if (typeof window === 'undefined') {
       return null;
     }
@@ -61,11 +59,7 @@ export default function CartPage() {
     if (!stored) {
       return null;
     }
-    const parsed = parseInt(stored, 10);
-    if (Number.isNaN(parsed) || parsed <= 0) {
-      return null;
-    }
-    return parsed.toString();
+    return stored;
   }, []);
 
   const clearStoredCoupon = useCallback(() => {
@@ -89,20 +83,19 @@ export default function CartPage() {
     setCouponError('');
   }, [clearStoredCoupon]);
 
-  const syncTableFromStorage = useCallback(() => {
-    if (!isHydrated || orderType !== 'dine-in') {
+  const syncRoomFromStorage = useCallback(() => {
+    if (!isHydrated) {
       return;
     }
-    const storedTable = getStoredTableNumber();
-    const userTable = user?.tableNumber ? user.tableNumber.toString() : null;
-    // Prioritize fresh QR scan (localStorage), fallback to user profile
-    const nextTable = storedTable || userTable;
-    if (nextTable) {
-      setTableNumber((current) => (current === nextTable ? current : nextTable));
+    const storedRoom = getStoredRoomNumber();
+    const userRoom = user?.roomNumber ? user.roomNumber.toString() : null;
+    const nextRoom = storedRoom || userRoom;
+    if (nextRoom) {
+      setRoomNumber((current) => (current === nextRoom ? current : nextRoom));
     } else {
-      setTableNumber((current) => (current === '' ? current : ''));
+      setRoomNumber((current) => (current === '' ? current : ''));
     }
-  }, [getStoredTableNumber, isHydrated, orderType, user?.tableNumber]);
+  }, [getStoredRoomNumber, isHydrated, user?.roomNumber]);
 
   useEffect(() => {
     setIsHydrated(true);
@@ -114,14 +107,14 @@ export default function CartPage() {
     }
 
     syncUser();
-    syncTableFromStorage();
+    syncRoomFromStorage();
 
     const handleStorage = (event: StorageEvent) => {
       if (event.key === 'foodhubUser') {
         syncUser();
       }
       if (!event.key || event.key === SELECTED_TABLE_STORAGE_KEY) {
-        syncTableFromStorage();
+        syncRoomFromStorage();
       }
     };
 
@@ -136,7 +129,7 @@ export default function CartPage() {
       window.removeEventListener('storage', handleStorage);
       window.removeEventListener('foodhub-auth-change', handleAuthChange);
     };
-  }, [isHydrated, syncTableFromStorage, syncUser]);
+  }, [isHydrated, syncRoomFromStorage, syncUser]);
 
   const fetchAvailableCoupons = useCallback(async () => {
     if (!isHydrated) {
@@ -209,9 +202,8 @@ export default function CartPage() {
       setCustomerName('');
       setCustomerPhone('');
       setCustomerEmail('');
-      setAddress('');
-      if (!getStoredTableNumber()) {
-        setTableNumber('');
+      if (!getStoredRoomNumber()) {
+        setRoomNumber('');
       }
       return;
     }
@@ -219,21 +211,11 @@ export default function CartPage() {
     setCustomerName(user.name ?? '');
     setCustomerPhone(user.phone ?? '');
     setCustomerEmail(user.email ?? '');
-
-    if (user.address) {
-      setAddress(user.address);
-    }
-
-    // Don't set table number from user profile - only use fresh QR scans
-    // if (orderType === 'dine-in' && user.tableNumber) {
-    //   const userTable = user.tableNumber.toString();
-    //   setTableNumber((current) => (current === userTable ? current : userTable));
-    // }
-  }, [isHydrated, user?.name, user?.phone, user?.email, user?.address, user, getStoredTableNumber, orderType]);
+  }, [isHydrated, user?.name, user?.phone, user?.email, user, getStoredRoomNumber]);
 
   useEffect(() => {
-    syncTableFromStorage();
-  }, [syncTableFromStorage]);
+    syncRoomFromStorage();
+  }, [syncRoomFromStorage]);
 
   useEffect(() => {
     if (!isHydrated) {
@@ -407,18 +389,8 @@ export default function CartPage() {
     
     setOrderError('');
     
-    if (!customerName.trim() || !customerPhone.trim()) {
+    if (!customerName.trim() || !customerPhone.trim() || !roomNumber.trim()) {
       alert('Please fill in all fields');
-      return;
-    }
-
-    if (orderType === 'dine-in' && !tableNumber.trim()) {
-      alert('Please enter table number');
-      return;
-    }
-
-    if (orderType === 'delivery' && !address.trim()) {
-      alert('Please enter delivery address');
       return;
     }
 
@@ -431,10 +403,8 @@ export default function CartPage() {
         name: customerName,
         phone: customerPhone,
         email: customerEmail || undefined,
-        orderType: orderType as 'dine-in' | 'takeaway' | 'delivery',
-        tableNumber: orderType === 'dine-in' ? tableNumber : undefined,
-        deliveryAddress: orderType === 'delivery' ? address : undefined,
-        deliveryNotes: orderType === 'delivery' ? deliveryNotes : undefined,
+        orderType: 'Rooms',
+        roomNumber,
         items: cart,
         subtotal,
         gst,
@@ -604,24 +574,16 @@ export default function CartPage() {
                 />
 
                 <form onSubmit={(e) => { e.preventDefault(); handlePlaceOrder(); }} className="space-y-4 mb-6">
-                  <div className="mb-4">
-                    <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-3">Order Type</label>
-                    <div className="grid grid-cols-3 gap-2">
-                      {['dine-in', 'takeaway', 'delivery'].map((type) => (
-                        <button
-                          key={type}
-                          type="button"
-                          onClick={() => setOrderType(type)}
-                          className={`py-2 sm:py-3 px-2 sm:px-3 rounded-lg font-medium text-xs sm:text-sm transition-all whitespace-nowrap ${
-                            orderType === type
-                              ? 'bg-orange-500 text-white'
-                              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                          }`}
-                        >
-                          {type === 'dine-in' ? '🍽️ Dine In' : type === 'takeaway' ? '📦 Takeaway' : '🚗 Delivery'}
-                        </button>
-                      ))}
-                    </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Room Number</label>
+                    <input
+                      type="text"
+                      placeholder="Enter room number"
+                      value={roomNumber}
+                      onChange={(e) => setRoomNumber(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                      required
+                    />
                   </div>
 
                   <div>
@@ -656,43 +618,7 @@ export default function CartPage() {
                     />
                   </div>
 
-                  {orderType === 'dine-in' && (
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Table Number</label>
-                      <input
-                        type="text"
-                        placeholder="Enter table number"
-                        value={tableNumber}
-                        onChange={(e) => setTableNumber(e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                      />
-                    </div>
-                  )}
 
-                  {orderType === 'delivery' && (
-                    <>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Delivery Address</label>
-                        <textarea
-                          placeholder="Enter your delivery address"
-                          value={address}
-                          onChange={(e) => setAddress(e.target.value)}
-                          rows={3}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Delivery Notes (Optional)</label>
-                        <textarea
-                          placeholder="Any special instructions for delivery"
-                          value={deliveryNotes}
-                          onChange={(e) => setDeliveryNotes(e.target.value)}
-                          rows={2}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                        />
-                      </div>
-                    </>
-                  )}
 
                   <Button
                     type="submit"

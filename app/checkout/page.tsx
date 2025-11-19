@@ -22,10 +22,8 @@ interface OrderData {
   name: string;
   phone: string;
   email?: string;
-  orderType: 'dine-in' | 'takeaway' | 'delivery';
-  tableNumber?: string;
-  deliveryAddress?: string;
-  deliveryNotes?: string;
+  orderType: 'Rooms';
+  roomNumber: string;
   items: OrderItem[];
   subtotal: number;
   gst: number;
@@ -133,9 +131,7 @@ export default function CheckoutPage() {
         customerEmail: orderData.email?.trim() || undefined,
         items: validatedItems,
         orderType: orderData.orderType,
-        tableNumber: orderData.orderType === 'dine-in' ? orderData.tableNumber?.trim() : undefined,
-        deliveryAddress: orderData.orderType === 'delivery' ? orderData.deliveryAddress?.trim() : undefined,
-        deliveryNotes: orderData.orderType === 'delivery' ? orderData.deliveryNotes?.trim() : undefined,
+        roomNumber: orderData.roomNumber?.trim(),
         subtotal,
         gst,
         discountAmount: isNaN(discountAmount) ? 0 : discountAmount,
@@ -198,44 +194,7 @@ export default function CheckoutPage() {
 
       console.log('Payment added successfully:', paymentResult.data);
 
-      // Step 3: Update table status to occupied for dine-in orders
-      if (orderData.orderType === 'dine-in' && orderData.tableNumber) {
-        try {
-          // Fetch all tables to find the one with matching tableNumber
-          const tablesResponse = await fetch('/api/tables');
-          const tablesData = await tablesResponse.json();
 
-          if (tablesData.success && tablesData.data) {
-            const table = tablesData.data.find(
-              (t: any) => t.tableNumber.toString() === orderData.tableNumber?.toString()
-            );
-
-            if (table && table._id) {
-              // Update table status to occupied
-              const tableUpdateResponse = await fetch('/api/tables', {
-                method: 'PUT',
-                headers: {
-                  'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                  tableId: table._id,
-                  status: 'occupied',
-                }),
-              });
-
-              const tableUpdateResult = await tableUpdateResponse.json();
-              if (tableUpdateResult.success) {
-                console.log('Table marked as occupied:', tableUpdateResult.data);
-              } else {
-                console.warn('Failed to mark table as occupied:', tableUpdateResult.message);
-              }
-            }
-          }
-        } catch (tableError: any) {
-          console.warn('Error updating table status:', tableError.message);
-          // Don't fail the order if table update fails
-        }
-      }
 
       setPaymentConfirmed(true);
       clearCart();
@@ -292,14 +251,9 @@ export default function CheckoutPage() {
           month: 'long',
           day: 'numeric'
         })}</span></div>`);
-        printWindow.document.write(`<div class="details-row"><span class="label">Type:</span><span>${orderData.orderType.charAt(0).toUpperCase() + orderData.orderType.slice(1)}</span></div>`);
+        printWindow.document.write(`<div class="details-row"><span class="label">Type:</span><span>Room Service</span></div>`);
+        printWindow.document.write(`<div class="details-row"><span class="label">Room:</span><span>${orderData.roomNumber}</span></div>`);
         printWindow.document.write(`<div class="details-row"><span class="label">Payment:</span><span>${paymentMethod.toUpperCase()}${paymentMethod === 'upi' ? ` (${selectedUPIApp.toUpperCase()})` : ''}</span></div>`);
-        if (orderData.orderType === 'dine-in') {
-          printWindow.document.write(`<div class="details-row"><span class="label">Table:</span><span>${orderData.tableNumber}</span></div>`);
-        }
-        if (orderData.orderType === 'delivery') {
-          printWindow.document.write(`<div class="details-row"><span class="label">Address:</span><span>${orderData.deliveryAddress}</span></div>`);
-        }
         printWindow.document.write('</div>');
         
         printWindow.document.write('<div class="section"><h3>Items</h3>');
@@ -332,10 +286,9 @@ export default function CheckoutPage() {
     if (!orderData) return;
 
     const itemsList = orderData.items.map((item) => `• ${item.name} (₹${item.price} x ${item.quantity})`).join('\n');
-    const orderType = orderData.orderType.charAt(0).toUpperCase() + orderData.orderType.slice(1);
     const adminPhone = process.env.NEXT_PUBLIC_ADMIN_PHONE_NUMBER || '6306438696';
 
-    const message = `📋 New Order Received\n\n👤 Customer Details:\nName: ${orderData.name}\nPhone: ${orderData.phone}\n${orderData.email ? `Email: ${orderData.email}\n` : ''}Order Type: ${orderType}\nPayment Method: ${paymentMethod.toUpperCase()}${paymentMethod === 'upi' ? ` (${selectedUPIApp.toUpperCase()})` : ''}\n${orderData.orderType === 'dine-in' ? `Table: ${orderData.tableNumber}\n` : ''}${orderData.orderType === 'delivery' ? `Address: ${orderData.deliveryAddress}\n` : ''}\n📦 Items:\n${itemsList}\n\n💰 Payment Details:\nSubtotal: ₹${orderData.subtotal.toFixed(0)}\nGST (5%): ₹${orderData.gst.toFixed(0)}\n${orderData.discountAmount > 0 ? `Discount: -₹${orderData.discountAmount.toFixed(0)}\n` : ''}Total: ₹${orderData.total.toFixed(0)}`;
+    const message = `📋 New Order Received\n\n👤 Customer Details:\nName: ${orderData.name}\nPhone: ${orderData.phone}\n${orderData.email ? `Email: ${orderData.email}\n` : ''}Order Type: Room Service\nRoom: ${orderData.roomNumber}\nPayment Method: ${paymentMethod.toUpperCase()}${paymentMethod === 'upi' ? ` (${selectedUPIApp.toUpperCase()})` : ''}\n\n📦 Items:\n${itemsList}\n\n💰 Payment Details:\nSubtotal: ₹${orderData.subtotal.toFixed(0)}\nGST (5%): ₹${orderData.gst.toFixed(0)}\n${orderData.discountAmount > 0 ? `Discount: -₹${orderData.discountAmount.toFixed(0)}\n` : ''}Total: ₹${orderData.total.toFixed(0)}`;
 
     const encodedMessage = encodeURIComponent(message);
     const whatsappURL = `https://wa.me/91${adminPhone}?text=${encodedMessage}`;
@@ -405,22 +358,14 @@ export default function CheckoutPage() {
                     })}
                   </p>
                   <p>
-                    <span className="font-medium">Type:</span>{' '}
-                    {orderData.orderType.charAt(0).toUpperCase() + orderData.orderType.slice(1)}
+                    <span className="font-medium">Type:</span> Room Service
+                  </p>
+                  <p>
+                    <span className="font-medium">Room:</span> {orderData.roomNumber}
                   </p>
                   <p>
                     <span className="font-medium">Payment:</span> {paymentMethod.toUpperCase()}{paymentMethod === 'upi' ? ` (${selectedUPIApp.toUpperCase()})` : ''}
                   </p>
-                  {orderData.orderType === 'dine-in' && (
-                    <p>
-                      <span className="font-medium">Table:</span> {orderData.tableNumber}
-                    </p>
-                  )}
-                  {orderData.orderType === 'delivery' && (
-                    <p>
-                      <span className="font-medium">Address:</span> {orderData.deliveryAddress}
-                    </p>
-                  )}
                 </div>
               </div>
 

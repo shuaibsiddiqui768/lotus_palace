@@ -23,10 +23,8 @@ export interface IOrder extends Document {
   customerName: string;
   customerPhone: string;
   customerEmail?: string;
-  orderType: 'dine-in' | 'takeaway' | 'delivery';
-  tableNumber?: string;
-  deliveryAddress?: string;
-  deliveryNotes?: string;
+  orderType: 'Rooms';
+  roomNumber: string;
   items: IOrderItem[];
   subtotal: number;
   gst: number;
@@ -111,17 +109,13 @@ const orderSchema = new Schema<IOrder>(
     },
     orderType: {
       type: String,
-      enum: ['dine-in', 'takeaway', 'delivery'],
+      enum: ['Rooms'],
+      default: 'Rooms',
       required: true,
     },
-    tableNumber: {
+    roomNumber: {
       type: String,
-    },
-    deliveryAddress: {
-      type: String,
-    },
-    deliveryNotes: {
-      type: String,
+      required: true,
     },
     items: [orderItemSchema],
     subtotal: {
