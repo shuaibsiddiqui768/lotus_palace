@@ -20,7 +20,7 @@ export function Sidebar({ readyCount, tableCount, onOrdersViewed, onTablesViewed
 
   const links = [
     { href: '/waiters/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { href: '/waiters/tables', label: 'Tables', icon: Table2 },
+    { href: '/waiters/rooms', label: 'Rooms', icon: Table2 },
     { href: '/waiters/orders', label: 'Orders', icon: ShoppingCart },
     { href: '/waiters/menu', label: 'Menu', icon: UtensilsCrossed },
   ];

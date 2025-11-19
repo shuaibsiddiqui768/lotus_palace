@@ -227,7 +227,7 @@ export default function RoomsPage() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ tableId: roomInfo._id, status }),
+        body: JSON.stringify({ roomId: roomInfo._id, status }),
       });
 
       const data = await response.json();

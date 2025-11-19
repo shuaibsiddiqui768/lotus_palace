@@ -3,6 +3,7 @@ import connectDB from '@/lib/mongodb';
 import Order from '@/models/Order';
 import User from '@/models/User';
 import Coupon from '@/models/Coupon';
+import Room from '@/models/Room';
 
 export async function GET(request: NextRequest) {
   try {
@@ -288,6 +289,17 @@ export async function POST(request: NextRequest) {
     console.log('POST /api/orders - Creating order with data:', orderData);
     const order = await Order.create(orderData);
     console.log('POST /api/orders - Order created:', order._id);
+
+    const room = await Room.findOne({ roomNumber });
+    if (room) {
+      room.status = 'occupied';
+      room.currentOrder = order._id;
+      room.assignedUser = user._id;
+      await room.save();
+      console.log('POST /api/orders - Room marked as occupied:', roomNumber);
+    } else {
+      console.warn(`POST /api/orders - Room not found for room number: ${roomNumber}`);
+    }
 
     // Update user's order history
     if (!Array.isArray(user.orderHistory)) {

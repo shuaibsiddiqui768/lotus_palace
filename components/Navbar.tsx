@@ -32,14 +32,14 @@ export default function Navbar() {
   const [searchValue, setSearchValue] = useState('');
 
   const syncUser = useCallback(() => {
-    if (typeof window === 'undefined') {
-      return;
-    }
+    if (typeof window === 'undefined') return;
+
     const stored = window.localStorage.getItem('foodhubUser');
     if (!stored) {
       setUser(null);
       return;
     }
+
     try {
       setUser(JSON.parse(stored));
     } catch {
@@ -50,11 +50,7 @@ export default function Navbar() {
   useEffect(() => {
     if (loginOpen) {
       const mode = searchParams.get('mode');
-      if (mode === 'signup') {
-        setVariant('signup');
-      } else {
-        setVariant('login');
-      }
+      setVariant(mode === 'signup' ? 'signup' : 'login');
     } else {
       setVariant('login');
     }
@@ -66,15 +62,12 @@ export default function Navbar() {
   }, [searchParams]);
 
   useEffect(() => {
-    if (typeof window === 'undefined') {
-      return;
-    }
+    if (typeof window === 'undefined') return;
+
     syncUser();
 
     const handleStorage = (event: StorageEvent) => {
-      if (event.key === 'foodhubUser') {
-        syncUser();
-      }
+      if (event.key === 'foodhubUser') syncUser();
     };
 
     const handleAuthChange = () => {
@@ -94,10 +87,12 @@ export default function Navbar() {
     (event: React.FormEvent<HTMLFormElement>) => {
       event.preventDefault();
       const trimmed = searchValue.trim();
+
       if (trimmed) {
         router.push(`/menu?search=${encodeURIComponent(trimmed)}`);
         return;
       }
+
       router.push('/menu');
     },
     [router, searchValue]
@@ -132,20 +127,23 @@ export default function Navbar() {
   };
 
   const handleLogout = useCallback(() => {
-    if (typeof window === 'undefined') {
-      return;
-    }
+    if (typeof window === 'undefined') return;
+
     window.localStorage.removeItem('foodhubUser');
+
     const guestCartKey = window.localStorage.getItem('guestCartId');
     if (guestCartKey) {
       window.localStorage.removeItem(`cart_guest_${guestCartKey}`);
     }
+
     const storedUser = user?._id ?? user?.id ?? null;
     if (storedUser) {
       window.localStorage.removeItem(`cart_user_${storedUser}`);
     }
+
     window.dispatchEvent(new Event('foodhub-auth-change'));
     setUser(null);
+
     if (session) {
       signOut({ callbackUrl: '/' });
     } else {
@@ -158,15 +156,19 @@ export default function Navbar() {
   return (
     <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md shadow-md">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col gap-3 sm:gap-4 py-2 sm:py-3">
+
+        {/* 🔥 Reduced vertical padding here */}
+        <div className="flex flex-col gap-3 sm:gap-4 py-1 sm:py-2">
+
           <div className="flex w-full items-center gap-3 sm:gap-6">
-            <Link href="/" className="flex items-center space-x-2 sm:space-x-3 hover:opacity-80 transition-opacity">
-              {/* <div className="bg-gradient-to-r from-orange-500 to-red-500 p-2 rounded-lg"> */}
-                {/* <span className="text-white font-bold text-lg sm:text-xl"></span> */}
-              {/* </div> */}
-              <span className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
-                FoodHub
-              </span>
+
+            {/* Logo */}
+            <Link href="/" className="flex items-center h-full hover:opacity-80 transition-opacity">
+              <img
+                src="https://res.cloudinary.com/dsb0vh0vu/image/upload/v1763559340/ChatGPT_Image_Nov_19_2025_01_41_57_PM_m8y7tw.png"
+                alt="FoodHub Logo"
+                className="h-14 sm:h-16 w-auto object-contain"
+              />
             </Link>
 
             {renderSearchForm('hidden sm:flex flex-1 justify-center')}
@@ -184,7 +186,7 @@ export default function Navbar() {
                   <ShoppingCart className="h-4 w-4" />
                   <span className="hidden sm:inline">Cart</span>
                   {getTotalItems() > 0 && (
-                    <Badge className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 bg-red-500 text-white text-xs">
+                    <Badge className="absolute -top-1 -right-1 h-5 w-5 bg-red-500 text-white text-xs flex items-center justify-center">
                       {getTotalItems()}
                     </Badge>
                   )}
@@ -196,11 +198,13 @@ export default function Navbar() {
                   <DropdownMenuTrigger asChild>
                     <Button type="button" variant="outline" size="sm" className="flex items-center space-x-2">
                       <User className="h-4 w-4" />
-                      <span className="hidden sm:inline max-w-[8rem] truncate text-left">{displayName}</span>
+                      <span className="hidden sm:inline max-w-[8rem] truncate">{displayName}</span>
                     </Button>
                   </DropdownMenuTrigger>
+
                   <DropdownMenuContent align="end" className="w-48">
-                    <DropdownMenuLabel className="max-w-full truncate">{displayName}</DropdownMenuLabel>
+                    <DropdownMenuLabel>{displayName}</DropdownMenuLabel>
+
                     <DropdownMenuItem
                       onSelect={(event) => {
                         event.preventDefault();
@@ -210,7 +214,9 @@ export default function Navbar() {
                       <ClipboardList className="mr-2 h-4 w-4" />
                       Track orders
                     </DropdownMenuItem>
+
                     <DropdownMenuSeparator />
+
                     <DropdownMenuItem
                       onSelect={(event) => {
                         event.preventDefault();
@@ -227,8 +233,8 @@ export default function Navbar() {
                   type="button"
                   variant="outline"
                   size="sm"
-                  className="flex items-center space-x-2"
                   onClick={() => handleOpen('login')}
+                  className="flex items-center space-x-2"
                 >
                   <LogIn className="h-4 w-4" />
                   <span className="hidden sm:inline">Login</span>
@@ -237,11 +243,10 @@ export default function Navbar() {
             </div>
           </div>
 
-          <div className="sm:hidden">
-            {renderSearchForm('flex w-full')}
-          </div>
+          <div className="sm:hidden">{renderSearchForm('flex w-full')}</div>
         </div>
       </div>
+
       <Dialog
         open={loginOpen}
         onOpenChange={(open) => {
