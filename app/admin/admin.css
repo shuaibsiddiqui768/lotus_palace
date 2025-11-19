@@ -1,0 +1,140 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.admin-container {
+  @apply flex flex-col md:flex-row h-screen bg-gray-50;
+}
+
+.admin-sidebar {
+  @apply fixed md:static w-64 bg-white border-r border-gray-200 h-full z-50 transition-all duration-300 ease-in-out;
+}
+
+.admin-sidebar-open {
+  @apply left-0;
+}
+
+.admin-sidebar-closed {
+  @apply -left-full md:left-0;
+}
+
+.admin-main {
+  @apply flex-1 flex flex-col overflow-hidden;
+}
+
+.admin-header {
+  @apply sticky top-0 z-10 border-b border-gray-200 bg-white;
+}
+
+.admin-content {
+  @apply flex-1 overflow-y-auto p-3 sm:p-4 md:p-6;
+}
+
+/* Mobile overlay */
+.admin-overlay {
+  @apply fixed inset-0 bg-black/50 z-40 md:hidden;
+}
+
+/* Mobile menu button */
+.admin-menu-button {
+  @apply fixed top-4 left-4 z-50 md:hidden;
+}
+
+/* Responsive tables */
+.admin-table {
+  @apply w-full overflow-x-auto;
+}
+
+.admin-table-row {
+  @apply flex flex-col sm:flex-row items-start gap-3 sm:gap-4 p-3 sm:p-4 border border-gray-200 rounded-lg;
+}
+
+.admin-card {
+  @apply p-3 sm:p-6 shadow-sm;
+}
+
+/* Responsive text */
+.admin-title {
+  @apply text-base sm:text-lg font-semibold;
+}
+
+.admin-text {
+  @apply text-xs sm:text-sm;
+}
+
+/* Responsive form elements */
+.admin-input {
+  @apply w-full px-2 sm:px-3 py-1.5 sm:py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500;
+}
+
+.admin-button {
+  @apply h-9 sm:h-10 text-sm;
+}
+
+/* Responsive grid layouts */
+.admin-grid {
+  @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4;
+}
+
+/* Responsive padding and margins */
+.admin-p {
+  @apply p-3 sm:p-4 md:p-6;
+}
+
+.admin-m {
+  @apply m-3 sm:m-4 md:m-6;
+}
+
+.admin-py {
+  @apply py-3 sm:py-4 md:py-6;
+}
+
+.admin-px {
+  @apply px-3 sm:px-4 md:px-6;
+}
+
+/* Responsive spacing */
+.admin-space-y {
+  @apply space-y-3 sm:space-y-4;
+}
+
+.admin-space-x {
+  @apply space-x-3 sm:space-x-4;
+}
+
+/* Responsive gap */
+.admin-gap {
+  @apply gap-2 sm:gap-3 md:gap-4;
+}
+
+.min-h-screen.bg-gray-50 {
+  @apply bg-gradient-to-br from-orange-50 via-white to-orange-100;
+}
+
+.min-h-screen.bg-gray-50 > .flex.items-center.justify-center {
+  @apply py-20 px-6;
+}
+
+.min-h-screen.bg-gray-50 > .flex.items-center.justify-center > .w-full.max-w-md {
+  @apply bg-white/90 backdrop-blur border border-orange-100 shadow-2xl rounded-3xl p-10 space-y-8;
+}
+
+.min-h-screen.bg-gray-50 > .flex.items-center.justify-center > .w-full.max-w-md h1 {
+  @apply text-4xl font-semibold text-orange-600;
+}
+
+.min-h-screen.bg-gray-50 > .flex.items-center.justify-center > .w-full.max-w-md p {
+  @apply text-gray-500;
+}
+
+.min-h-screen.bg-gray-50 > .flex.items-center.justify-center > .w-full.max-w-md form {
+  @apply space-y-6;
+}
+
+.min-h-screen.bg-gray-50 > .flex.items-center.justify-center > .w-full.max-w-md form input {
+  @apply border-orange-200 focus:border-orange-400 focus:ring-orange-500 focus:ring-2;
+}
+
+.min-h-screen.bg-gray-50 > .flex.items-center.justify-center > .w-full.max-w-md form button[type='submit'] {
+  @apply bg-orange-500 hover:bg-orange-600 focus:ring-2 focus:ring-orange-500 focus:ring-offset-2;
+}

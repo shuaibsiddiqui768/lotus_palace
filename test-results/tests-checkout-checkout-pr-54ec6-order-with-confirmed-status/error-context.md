@@ -1,0 +1,45 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - navigation [ref=e3]:
+      - generic [ref=e6]:
+        - link "FoodHub" [ref=e7] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e8]: FoodHub
+        - generic [ref=e10]:
+          - textbox "Search menu" [ref=e11]:
+            - /placeholder: Search menu...
+          - button "Submit search" [ref=e12] [cursor=pointer]:
+            - img [ref=e13]
+        - generic [ref=e16]:
+          - link "Menu" [ref=e17] [cursor=pointer]:
+            - /url: /menu
+            - button "Menu" [ref=e18]:
+              - img [ref=e19]
+              - generic [ref=e24]: Menu
+          - link "Cart" [ref=e25] [cursor=pointer]:
+            - /url: /cart
+            - button "Cart" [ref=e26]:
+              - img [ref=e27]
+              - generic [ref=e31]: Cart
+          - button "Login" [ref=e32] [cursor=pointer]:
+            - img [ref=e33]
+            - generic [ref=e36]: Login
+    - generic [ref=e37]:
+      - link "Back to Menu" [ref=e38] [cursor=pointer]:
+        - /url: /
+        - img [ref=e39]
+        - text: Back to Menu
+      - heading "Your Cart" [level=1] [ref=e41]
+      - generic [ref=e44]:
+        - img [ref=e45]
+        - paragraph [ref=e49]: Your cart is empty
+        - link "Continue Shopping" [ref=e50] [cursor=pointer]:
+          - /url: /
+          - button "Continue Shopping" [ref=e51]
+  - region "Notifications (F8)":
+    - list
+  - alert [ref=e52]
+```
