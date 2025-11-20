@@ -91,15 +91,15 @@ export default function OrdersPageClient() {
 
   if (!customerPhone && provider !== 'google') {
     return (
-      <div className="flex-1 max-w-md mx-auto w-full px-4 sm:px-6 lg:px-8 py-6 md:py-8">
-        <div className="bg-white rounded-lg shadow p-6 space-y-4 text-center">
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Track Order</h1>
-          <p className="text-sm text-gray-600">
+      <div className="flex-1 max-w-md mx-auto w-full px-4 sm:px-6 lg:px-8 py-6 md:py-8 bg-gradient-to-b from-emerald-50 via-white to-emerald-50">
+        <div className="bg-white/95 rounded-3xl shadow-xl border border-emerald-100 p-6 space-y-4 text-center">
+          <h1 className="text-2xl sm:text-3xl font-bold text-emerald-900">Track Order</h1>
+          <p className="text-sm text-emerald-900/75">
             We couldn&apos;t find contact details associated with your account. Please update your profile information and try again.
           </p>
           <Button
             onClick={() => router.push('/')}
-            className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white"
+            className="bg-gradient-to-r from-emerald-600 to-lime-600 hover:from-emerald-700 hover:to-lime-700 text-white"
           >
             Back to home
           </Button>
@@ -109,10 +109,12 @@ export default function OrdersPageClient() {
   }
 
   return (
-    <TrackOrder
-      userId={userId}
-      initialPhone={customerPhone}
-      onBack={() => router.push('/')}
-    />
+    <div className="flex-1 bg-gradient-to-b from-emerald-50 via-white to-emerald-50">
+      <TrackOrder
+        userId={userId}
+        initialPhone={customerPhone}
+        onBack={() => router.push('/')}
+      />
+    </div>
   );
 }

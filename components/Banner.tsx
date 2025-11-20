@@ -84,14 +84,14 @@ const Banner = ({ onOrderClick, onViewMenuClick }: BannerProps) => {
         ))}
       </div>
 
-      {/* Arrows - guaranteed clickable */}
+      {/* Arrows - hidden on mobile, visible from sm and up */}
       <button
         type="button"
         onClick={prevSlide}
         aria-label="Previous slide"
-        className="absolute left-4 sm:left-8 top-1/2 -translate-y-1/2 z-20 pointer-events-auto
+        className="hidden sm:flex absolute left-4 sm:left-8 top-1/2 -translate-y-1/2 z-20 pointer-events-auto
         h-10 w-10 sm:h-12 sm:w-12 rounded-full bg-white/20 backdrop-blur-md border border-white/30 
-        flex items-center justify-center text-white hover:bg-white/30 transition-all duration-300 shadow-lg"
+        items-center justify-center text-white hover:bg-white/30 transition-all duration-300 shadow-lg"
       >
         <ChevronLeft className="h-5 w-5 sm:h-6 sm:w-6" />
       </button>
@@ -100,9 +100,9 @@ const Banner = ({ onOrderClick, onViewMenuClick }: BannerProps) => {
         type="button"
         onClick={nextSlide}
         aria-label="Next slide"
-        className="absolute right-4 sm:right-8 top-1/2 -translate-y-1/2 z-20 pointer-events-auto
+        className="hidden sm:flex absolute right-4 sm:right-8 top-1/2 -translate-y-1/2 z-20 pointer-events-auto
         h-10 w-10 sm:h-12 sm:w-12 rounded-full bg-white/20 backdrop-blur-md border border-white/30 
-        flex items-center justify-center text-white hover:bg-white/30 transition-all duration-300 shadow-lg"
+        items-center justify-center text-white hover:bg-white/30 transition-all duration-300 shadow-lg"
       >
         <ChevronRight className="h-5 w-5 sm:h-6 sm:w-6" />
       </button>
