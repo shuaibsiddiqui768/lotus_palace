@@ -9,8 +9,11 @@ import AuthProvider from '@/components/AuthProvider';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'FoodHub - Order Delicious Food Online',
+  title: 'Lotus Hotel & Banquet Hall in Lucknow | Luxuary Rooms & Event Spaces',
   description: 'Order your favorite meals from the best restaurants. Fast delivery, fresh food.',
+  icons: {
+    icon: 'https://res.cloudinary.com/dsb0vh0vu/image/upload/v1763559340/ChatGPT_Image_Nov_19_2025_01_41_57_PM_m8y7tw.png',
+  },
 };
 
 export default function RootLayout({
