@@ -2,7 +2,14 @@
 
 import { Gift, Tag, X, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 
 export interface CouponOption {
   id: string;
@@ -52,11 +59,14 @@ export default function CouponInput({
   onRefreshCoupons,
 }: CouponInputProps) {
   return (
-    <div className="mb-6 pb-6 border-b space-y-3">
-      <label className="block text-xs sm:text-sm font-medium text-gray-700">Apply Coupon</label>
+    <div className="mb-6 pb-6 border-b border-emerald-100 space-y-3">
+      <label className="block text-xs sm:text-sm font-semibold text-emerald-900">
+        Apply Coupon
+      </label>
+
       {!appliedCoupon ? (
         <div className="flex gap-2">
-          <div className="flex-1 relative">
+          <div className="flex-1">
             <input
               type="text"
               placeholder="Enter coupon code"
@@ -65,116 +75,183 @@ export default function CouponInput({
                 setCouponCode(e.target.value.toUpperCase());
               }}
               onKeyPress={(e) => e.key === 'Enter' && handleApplyCoupon()}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm"
+              className="w-full px-3 py-2 rounded-full border border-emerald-200 bg-white/90 text-sm text-emerald-900 placeholder:text-emerald-700/40 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400 shadow-sm"
             />
           </div>
           <Button
             onClick={handleApplyCoupon}
             size="sm"
-            className="bg-orange-500 hover:bg-orange-600 text-white"
+            className="rounded-full bg-gradient-to-r from-emerald-600 to-lime-600 hover:from-emerald-700 hover:to-lime-700 text-white px-4 text-xs sm:text-sm shadow-md"
           >
             Apply
           </Button>
         </div>
       ) : (
-        <div className="flex items-center justify-between bg-green-50 p-3 rounded-lg border border-green-200">
+        <div className="flex items-center justify-between bg-emerald-50/90 p-3 rounded-2xl border border-emerald-200 shadow-sm">
           <div className="flex items-center gap-2">
-            <Tag className="h-4 w-4 text-green-600" />
+            <div className="h-8 w-8 rounded-full bg-emerald-100 flex items-center justify-center">
+              <Tag className="h-4 w-4 text-emerald-700" />
+            </div>
             <div>
-              <p className="font-medium text-sm text-gray-900">{appliedCoupon.code}</p>
-              <p className="text-xs text-gray-600">{appliedCoupon.description || appliedCoupon.name || 'Coupon applied'}</p>
+              <p className="font-semibold text-sm text-emerald-900">
+                {appliedCoupon.code}
+              </p>
+              <p className="text-xs text-emerald-900/70">
+                {appliedCoupon.description ||
+                  appliedCoupon.name ||
+                  'Coupon applied to this order'}
+              </p>
             </div>
           </div>
 
           <button
+            type="button"
             onClick={handleRemoveCoupon}
-            className="text-gray-400 hover:text-red-500"
+            className="text-emerald-500 hover:text-red-500 transition-colors"
           >
             <X className="h-4 w-4" />
           </button>
-          
         </div>
       )}
-      {couponError && <p className="text-xs text-red-500">{couponError}</p>}
+
+      {couponError && (
+        <p className="text-xs text-red-500 mt-1">{couponError}</p>
+      )}
+
       <Dialog open={showCouponModal} onOpenChange={setShowCouponModal}>
         <DialogTrigger asChild>
-          <Button variant="outline" size="sm" className="w-full text-xs sm:text-sm">
-            <Gift className="h-4 w-4 mr-2" />
+          <Button
+            variant="outline"
+            size="sm"
+            className="w-full text-xs sm:text-sm rounded-full border-emerald-200 text-emerald-800 hover:bg-emerald-50 flex items-center justify-center gap-2"
+          >
+            <Gift className="h-4 w-4" />
             View Available Coupons
           </Button>
         </DialogTrigger>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-md border-emerald-100">
           <DialogHeader>
-            <DialogTitle>Available Coupons</DialogTitle>
-            <DialogDescription>Select a coupon to apply discount to your order</DialogDescription>
+            <DialogTitle className="text-emerald-900">
+              Available Coupons
+            </DialogTitle>
+            <DialogDescription className="text-emerald-900/70">
+              Select a coupon to apply discount to your order at Lotus Palace.
+            </DialogDescription>
           </DialogHeader>
-          <div className="flex justify-between items-center mb-2">
+
+          <div className="flex justify-between items-center mb-3">
             <Button
               type="button"
               variant="ghost"
               size="sm"
               onClick={onRefreshCoupons}
               disabled={isCouponLoading}
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 text-emerald-800 hover:text-emerald-900 hover:bg-emerald-50"
             >
-              <RefreshCw className={`h-4 w-4 ${isCouponLoading ? 'animate-spin' : ''}`} />
-              Refresh
+              <RefreshCw
+                className={`h-4 w-4 ${
+                  isCouponLoading ? 'animate-spin' : ''
+                }`}
+              />
+              <span className="text-xs sm:text-sm">Refresh</span>
             </Button>
-            {couponFetchError && <p className="text-xs text-red-500">{couponFetchError}</p>}
+            {couponFetchError && (
+              <p className="text-xs text-red-500 text-right">
+                {couponFetchError}
+              </p>
+            )}
           </div>
-          <div className="space-y-3 max-h-[400px] overflow-y-auto">
+
+          <div className="space-y-3 max-h-[400px] overflow-y-auto pr-1">
             {availableCoupons.length === 0 ? (
-              <div className="text-sm text-gray-500 text-center py-6">
-                {isCouponLoading ? 'Loading coupons...' : 'No coupons available at the moment.'}
+              <div className="text-sm text-emerald-900/60 text-center py-6 bg-emerald-50/60 rounded-2xl border border-dashed border-emerald-200">
+                {isCouponLoading
+                  ? 'Loading coupons...'
+                  : 'No coupons available at the moment.'}
               </div>
             ) : (
               availableCoupons.map((coupon) => {
-                const minOrderValue = typeof coupon.minOrder === 'number' ? coupon.minOrder : Number(coupon.minOrder) || 0;
-                const isEligible = minOrderValue <= 0 || subtotalWithGST >= minOrderValue;
-                const remainingAmount = Math.max(0, minOrderValue - subtotalWithGST);
-                const expiresAt = coupon.expiryDate ? new Date(coupon.expiryDate) : null;
+                const minOrderValue =
+                  typeof coupon.minOrder === 'number'
+                    ? coupon.minOrder
+                    : Number(coupon.minOrder) || 0;
+                const isEligible =
+                  minOrderValue <= 0 || subtotalWithGST >= minOrderValue;
+                const remainingAmount = Math.max(
+                  0,
+                  minOrderValue - subtotalWithGST
+                );
+                const expiresAt = coupon.expiryDate
+                  ? new Date(coupon.expiryDate)
+                  : null;
+
+                const isApplied = appliedCoupon?.code === coupon.code;
+
                 return (
                   <button
                     key={coupon.id}
+                    type="button"
                     onClick={() => isEligible && handleSelectCoupon(coupon)}
-                    disabled={!isEligible || appliedCoupon?.code === coupon.code}
+                    disabled={!isEligible || isApplied}
                     aria-disabled={!isEligible}
-                    className={`w-full p-3 border rounded-lg text-left transition-all ${
-                      appliedCoupon?.code === coupon.code
-                        ? 'border-green-500 bg-green-50'
+                    className={`w-full p-3 rounded-2xl text-left transition-all border ${
+                      isApplied
+                        ? 'border-emerald-500 bg-emerald-50 shadow-sm'
                         : isEligible
-                        ? 'border-gray-200 hover:border-orange-500 hover:bg-orange-50'
-                        : 'border-gray-100 bg-gray-50 opacity-40 cursor-not-allowed'
+                        ? 'border-emerald-100 bg-white hover:border-emerald-300 hover:bg-emerald-50/60 shadow-sm hover:shadow-md'
+                        : 'border-emerald-50 bg-emerald-50/70 opacity-60 cursor-not-allowed'
                     }`}
                   >
-                    <div className="flex items-start justify-between">
+                    <div className="flex items-start justify-between gap-3">
                       <div className="flex-1">
-                        <p className="font-medium text-sm text-gray-900">{coupon.code}</p>
-                        <p className="text-xs text-gray-600 mt-1">{coupon.description || 'No description provided'}</p>
+                        <p className="font-semibold text-sm text-emerald-900">
+                          {coupon.code}
+                        </p>
+                        <p className="text-xs text-emerald-900/70 mt-1">
+                          {coupon.description || 'No description provided'}
+                        </p>
                         {minOrderValue > 0 && (
-                          <p className="text-xs text-gray-500 mt-1">Min order: ₹{minOrderValue}</p>
-                        )}
-                        {!isEligible && minOrderValue > 0 && (
-                          <p className="text-xs text-red-500 mt-1">Add ₹{Math.max(0, Math.ceil(remainingAmount))} more to unlock</p>
-                        )}
-                        {expiresAt && !Number.isNaN(expiresAt.getTime()) && (
-                          <p className="text-xs text-gray-500 mt-1">
-                            Expires: {expiresAt.toLocaleDateString('en-IN', { month: 'short', day: 'numeric' })}
+                          <p className="text-xs text-emerald-900/60 mt-1">
+                            Min order: ₹{minOrderValue}
                           </p>
                         )}
+                        {!isEligible && minOrderValue > 0 && (
+                          <p className="text-xs text-red-500 mt-1">
+                            Add ₹{Math.max(
+                              0,
+                              Math.ceil(remainingAmount)
+                            )}{' '}
+                            more to unlock
+                          </p>
+                        )}
+                        {expiresAt &&
+                          !Number.isNaN(expiresAt.getTime()) && (
+                            <p className="text-xs text-emerald-900/60 mt-1">
+                              Expires:{' '}
+                              {expiresAt.toLocaleDateString('en-IN', {
+                                month: 'short',
+                                day: 'numeric',
+                              })}
+                            </p>
+                          )}
                       </div>
                       <div className="text-right">
-                        <p className="font-bold text-orange-600">
-                          {coupon.type === 'percentage' ? `${coupon.discount}%` : `₹${coupon.discount}`}
+                        <p className="font-bold text-emerald-700 text-sm">
+                          {coupon.type === 'percentage'
+                            ? `${coupon.discount}%`
+                            : `₹${coupon.discount}`}
                         </p>
-                        {appliedCoupon?.code === coupon.code && (
-                          <p className="text-xs text-green-600 mt-1">Applied</p>
+                        {isApplied && (
+                          <p className="text-xs text-emerald-600 mt-1 font-medium">
+                            Applied
+                          </p>
                         )}
                       </div>
                     </div>
                   </button>
                 );
-              }))}
+              })
+            )}
           </div>
         </DialogContent>
       </Dialog>
