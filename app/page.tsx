@@ -88,7 +88,7 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
+    <div className="min-h-screen flex flex-col">
       <Navbar />
       <Banner onOrderClick={() => setShowOrderForm(true)} onViewMenuClick={handleViewMenu} />
       <CategoryFilter
@@ -98,7 +98,7 @@ export default function Home() {
       />
       {loading ? (
         <div className="flex items-center justify-center py-20">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600"></div>
         </div>
       ) : error ? (
         <div className="flex items-center justify-center py-20 px-4">
@@ -106,7 +106,7 @@ export default function Home() {
             <p className="text-red-600 text-lg font-semibold mb-4">{error}</p>
             <button
               onClick={fetchFoodItems}
-              className="bg-orange-500 text-white px-6 py-2 rounded-lg hover:bg-orange-600 transition"
+              className="bg-emerald-600 text-white px-6 py-2 rounded-lg hover:bg-emerald-700 transition"
             >
               Try Again
             </button>

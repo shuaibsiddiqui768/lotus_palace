@@ -29,7 +29,9 @@ export default function MenuPage() {
         const transformedItems = data.data.map((mongoFood: MongoFoodItem) =>
           mongoFoodToFoodItem(mongoFood)
         );
-        const availableItems = transformedItems.filter((item: FoodItem) => item.is_available);
+        const availableItems = transformedItems.filter(
+          (item: FoodItem) => item.is_available
+        );
         setFoodItems(availableItems);
       } else {
         setError('Failed to load menu items. Please try again later.');
@@ -51,7 +53,7 @@ export default function MenuPage() {
       const bc = new BroadcastChannel('food-menu-updates');
       bc.onmessage = (event) => {
         if (event.data.type === 'refresh') {
-          setRefreshTrigger(prev => prev + 1);
+          setRefreshTrigger((prev) => prev + 1);
         }
       };
       return () => bc.close();
@@ -59,28 +61,43 @@ export default function MenuPage() {
   }, []);
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
+    <div className="min-h-screen flex flex-col bg-gradient-to-b from-emerald-50 via-white to-lime-50">
       <Navbar />
 
-      <div className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6 md:py-8">
-        <Link href="/" className="flex items-center text-orange-600 hover:text-orange-700 mb-6 font-semibold">
-          <ArrowLeft className="h-5 w-5 mr-2" />
-          Back
-        </Link>
+      <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6 md:py-10">
+        <div className="mb-6 md:mb-8 flex items-center justify-between gap-3">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-white/80 px-4 py-2 text-sm font-semibold text-emerald-800 shadow-sm hover:bg-emerald-50 hover:text-emerald-900 hover:border-emerald-300 transition-colors"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back to home
+          </Link>
 
-        {/* <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-8">Our Menu</h1> */}
+          <div className="hidden sm:flex flex-col items-end text-right">
+            {/* <p className="text-xs font-semibold uppercase tracking-[0.25em] text-emerald-500">
+              Lotus Palace
+            </p>
+            <p className="text-base md:text-lg font-semibold text-emerald-900">
+              Explore the full menu
+            </p> */}
+          </div>
+        </div>
 
         {loading ? (
           <div className="flex items-center justify-center py-20">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
+            <div className="h-12 w-12 rounded-full border-2 border-emerald-200 border-t-emerald-600 animate-spin" />
           </div>
         ) : error ? (
           <div className="flex items-center justify-center py-20 px-4">
-            <div className="text-center">
-              <p className="text-red-600 text-lg font-semibold mb-4">{error}</p>
+            <div className="text-center bg-white/80 rounded-2xl shadow-md border border-red-100 px-6 py-8 max-w-md">
+              <p className="text-red-600 text-lg font-semibold mb-3">{error}</p>
+              <p className="text-sm text-emerald-900/70 mb-5">
+                Please check your connection and try reloading the menu.
+              </p>
               <button
                 onClick={() => fetchFoodItems(searchQuery)}
-                className="bg-orange-500 text-white px-6 py-2 rounded-lg hover:bg-orange-600 transition"
+                className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-emerald-600 to-lime-600 px-6 py-2.5 text-sm font-semibold text-white shadow hover:from-emerald-700 hover:to-lime-700 transition-colors"
               >
                 Try Again
               </button>
@@ -89,7 +106,7 @@ export default function MenuPage() {
         ) : (
           <FoodMenu items={foodItems} />
         )}
-      </div>
+      </main>
 
       <Footer />
     </div>

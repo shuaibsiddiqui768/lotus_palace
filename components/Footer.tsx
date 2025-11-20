@@ -19,48 +19,73 @@ export default function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-[#f4efeb] text-gray-800">
+    <footer className="bg-[#b7e4c7] text-emerald-900 border-t border-emerald-300/70">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
         <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 xl:grid-cols-4">
+          {/* Brand – logo only */}
           <div className="space-y-6">
-            <div className="flex items-center gap-4">
-           
-              <div>
-                <p className="bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-2xl font-extrabold text-transparent sm:text-3xl">
-                  FoodHub
-                </p>
-                <p className="text-xs font-semibold uppercase tracking-[0.4em] text-orange-600">Taste The Moments</p>
-              </div>
+            <div className="flex items-center">
+              <img
+                src="https://res.cloudinary.com/dsb0vh0vu/image/upload/v1763559340/ChatGPT_Image_Nov_19_2025_01_41_57_PM_m8y7tw.png"
+                alt="Lotus Palace Logo"
+                className="h-20 sm:h-24 md:h-28 w-auto object-contain"
+              />
             </div>
-            <p className="text-sm leading-relaxed text-gray-600">
-              Your favorite meals, freshly prepared and delivered with care. Discover curated menus and vibrant flavors crafted for every craving.
+            <p className="text-sm leading-relaxed text-emerald-900/85">
+              Your favorite meals, freshly prepared and served with warmth at Lotus Palace Hotel,
+              Banquet & Restaurant, where every visit becomes a cherished memory.
             </p>
             <div className="flex gap-3">
-              <Button variant="ghost" size="icon" className="rounded-full border border-orange-200 bg-white/70 text-orange-600 transition-colors hover:bg-orange-500 hover:text-white">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="rounded-full border border-emerald-300 bg-white/80 text-emerald-800 transition-colors hover:bg-emerald-700 hover:text-white shadow-sm"
+              >
                 <Facebook className="h-4 w-4" />
               </Button>
-              <Button variant="ghost" size="icon" className="rounded-full border border-orange-200 bg-white/70 text-orange-600 transition-colors hover:bg-orange-500 hover:text-white">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="rounded-full border border-emerald-300 bg-white/80 text-emerald-800 transition-colors hover:bg-emerald-700 hover:text-white shadow-sm"
+              >
                 <Twitter className="h-4 w-4" />
               </Button>
-              <Button variant="ghost" size="icon" className="rounded-full border border-orange-200 bg-white/70 text-orange-600 transition-colors hover:bg-orange-500 hover:text-white">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="rounded-full border border-emerald-300 bg-white/80 text-emerald-800 transition-colors hover:bg-emerald-700 hover:text-white shadow-sm"
+              >
                 <Instagram className="h-4 w-4" />
               </Button>
             </div>
           </div>
 
+          {/* Links */}
           <div>
-            <h3 className="text-lg font-semibold text-gray-900">Quick Links</h3>
+            <h3 className="text-lg font-semibold text-emerald-950">Quick Links</h3>
             <div className="mt-5 grid grid-cols-1 gap-3 text-sm">
-              <Link href="/" className="rounded-lg bg-white/70 px-4 py-2 font-medium text-gray-600 shadow-sm transition hover:-translate-y-0.5 hover:bg-white hover:text-orange-600">
+              <Link
+                href="/"
+                className="rounded-lg bg-white/85 px-4 py-2 font-medium text-emerald-900 shadow-sm transition hover:-translate-y-0.5 hover:bg-white hover:text-emerald-800"
+              >
                 Home
               </Link>
-              <Link href="/menu" className="rounded-lg bg-white/70 px-4 py-2 font-medium text-gray-600 shadow-sm transition hover:-translate-y-0.5 hover:bg-white hover:text-orange-600">
+              <Link
+                href="/menu"
+                className="rounded-lg bg-white/85 px-4 py-2 font-medium text-emerald-900 shadow-sm transition hover:-translate-y-0.5 hover:bg-white hover:text-emerald-800"
+              >
                 Menu
               </Link>
-              <Link href="/about" className="rounded-lg bg-white/70 px-4 py-2 font-medium text-gray-600 shadow-sm transition hover:-translate-y-0.5 hover:bg-white hover:text-orange-600">
+              <Link
+                href="/about"
+                className="rounded-lg bg-white/85 px-4 py-2 font-medium text-emerald-900 shadow-sm transition hover:-translate-y-0.5 hover:bg-white hover:text-emerald-800"
+              >
                 About Us
               </Link>
-              <Link href="/contactus" className="rounded-lg bg-white/70 px-4 py-2 font-medium text-gray-600 shadow-sm transition hover:-translate-y-0.5 hover:bg-white hover:text-orange-600">
+              <Link
+                href="/contactus"
+                className="rounded-lg bg-white/85 px-4 py-2 font-medium text-emerald-900 shadow-sm transition hover:-translate-y-0.5 hover:bg-white hover:text-emerald-800"
+              >
                 Contact Us
               </Link>
               <a
@@ -68,70 +93,77 @@ export default function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={handleAdminClick}
-                className="rounded-lg bg-white/70 px-4 py-2 text-left font-medium text-gray-600 shadow-sm transition hover:-translate-y-0.5 hover:bg-white hover:text-orange-600"
+                className="rounded-lg bg-white/85 px-4 py-2 text-left font-medium text-emerald-900 shadow-sm transition hover:-translate-y-0.5 hover:bg-white hover:text-emerald-800"
               >
                 Admin Panel
               </a>
-              <a href="/waiters/login" target="_blank" rel="noopener noreferrer" className="rounded-lg bg-white/70 px-4 py-2 font-medium text-gray-600 shadow-sm transition hover:-translate-y-0.5 hover:bg-white hover:text-orange-600">
+              <a
+                href="/waiters/login"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="rounded-lg bg-white/85 px-4 py-2 font-medium text-emerald-900 shadow-sm transition hover:-translate-y-0.5 hover:bg-white hover:text-emerald-800"
+              >
                 Waiters Dashboard
               </a>
-              
             </div>
           </div>
 
+          {/* Contact */}
           <div>
-            <h3 className="text-lg font-semibold text-gray-900">Contact</h3>
-            <ul className="mt-5 space-y-4 text-sm text-gray-600">
-              <li className="flex items-start gap-3 rounded-2xl p-4">
-                <MapPin className="mt-1 h-5 w-5 text-orange-600" />
-                <span>123 Food Street, Culinary City, FC 12345</span>
+            <h3 className="text-lg font-semibold text-emerald-950">Contact</h3>
+            <ul className="mt-5 space-y-4 text-sm text-emerald-900/90">
+              <li className="flex items-start gap-3 rounded-2xl p-4 bg-white/80 shadow-sm">
+                <MapPin className="mt-1 h-5 w-5 text-emerald-800" />
+                <span>
+                  1/84, Viraj Khand-3,
+                  <br />
+                  Gomti Nagar, Lucknow,
+                  <br />
+                  Uttar Pradesh 226010
+                </span>
               </li>
-              <li className="flex items-center gap-3 rounded-2xl p-4">
-                <Phone className="h-5 w-5 text-orange-600" />
-                <span>+1 (555) 123-4567</span>
+              <li className="flex items-center gap-3 rounded-2xl p-4 bg-white/80 shadow-sm">
+                <Phone className="h-5 w-5 text-emerald-800" />
+                <span>+91 00000 00000</span>
               </li>
-              <li className="flex items-center gap-3 rounded-2xl p-4">
-                <Mail className="h-5 w-5 text-orange-600" />
-                <span>support@foodhub.com</span>
+              <li className="flex items-center gap-3 rounded-2xl p-4 bg-white/80 shadow-sm">
+                <Mail className="h-5 w-5 text-emerald-800" />
+                <span>info@lotuspalace.com</span>
               </li>
             </ul>
           </div>
 
+          {/* Map */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-gray-900">Find Us</h3>
+            <h3 className="text-lg font-semibold text-emerald-950">Find Us</h3>
             <a
-              href="https://www.google.com/maps?q=40.7128,-74.0060"
+              href="https://maps.app.goo.gl/CzTC1PfQCNGjz2aY9"
               target="_blank"
               rel="noopener noreferrer"
-              className="group relative block overflow-hidden rounded-3xl shadow-lg ring-1 ring-orange-200"
+              className="group relative block overflow-hidden rounded-3xl shadow-lg ring-1 ring-emerald-300/90"
             >
               <iframe
-                title="FoodHub location"
-                src="https://www.google.com/maps?q=40.7128,-74.0060&z=15&output=embed"
+                title="Lotus Palace location"
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3559.5555669936255!2d80.99665737528274!3d26.85403217668101!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x399be300504998e7%3A0x15a603a7d805b8d9!2sHotel%20Lotus%20Palace!5e0!3m2!1sen!2sin!4v1732099800000!5m2!1sen!2sin"
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
                 className="pointer-events-none h-56 w-full border-0"
               />
-              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/30 via-black/10 to-transparent transition-opacity group-hover:opacity-80" />
-              <div className="pointer-events-none absolute bottom-4 left-4 flex items-center gap-2 rounded-full bg-white/90 px-4 py-2 text-sm font-semibold text-orange-600 shadow">
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/35 via-black/15 to-transparent transition-opacity group-hover:opacity-80" />
+              <div className="pointer-events-none absolute bottom-4 left-4 flex items-center gap-2 rounded-full bg-white/95 px-4 py-2 text-sm font-semibold text-emerald-800 shadow">
                 <MapPin className="h-4 w-4" />
                 View on Google Maps
               </div>
             </a>
-            <p className="text-sm text-gray-600">
-              Tap the map to open directions and plan your next visit to FoodHub HQ.
+            <p className="text-sm text-emerald-900/85">
+              Tap the map to open directions and plan your visit to Lotus Palace in Gomti Nagar, Lucknow.
             </p>
           </div>
         </div>
 
-        <div className="mt-12 border-t border-orange-200 pt-6">
-          <div className="flex flex-col items-center justify-between gap-4 text-sm text-gray-600 sm:flex-row">
-            <p>© {currentYear} FoodHub. All rights reserved.</p>
-            <div className="flex flex-wrap justify-center gap-4 sm:gap-6">
-              <a href="#" className="transition hover:text-orange-600">Privacy Policy</a>
-              <a href="#" className="transition hover:text-orange-600">Terms of Service</a>
-              <a href="#" className="transition hover:text-orange-600">Cookie Policy</a>
-            </div>
+        <div className="mt-12 border-t border-emerald-300 pt-6">
+          <div className="flex flex-col items-center justify-center gap-4 text-sm text-emerald-900/85 sm:flex-row sm:justify-between">
+            <p>© {currentYear} Lotus Palace. All rights reserved.</p>
           </div>
         </div>
       </div>
