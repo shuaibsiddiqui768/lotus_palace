@@ -95,16 +95,37 @@ export async function GET(request: NextRequest) {
       filter.restaurantId = restaurantId;
     }
 
-    const rooms = await Room.find(filter)
-      .sort({ roomNumber: 1 })
-      .populate('assignedUser', 'name phone email')
-      .populate('currentOrder')
-      .populate('orderHistory');
+    // First get rooms without populate to avoid errors
+    const rooms = await Room.find(filter).sort({ roomNumber: 1 });
+
+    // Try to populate safely
+    let populatedRooms;
+    try {
+      populatedRooms = await Room.populate(rooms, [
+        {
+          path: 'assignedUser',
+          select: 'name phone email',
+          options: { strictPopulate: false }
+        },
+        {
+          path: 'currentOrder',
+          options: { strictPopulate: false }
+        },
+        {
+          path: 'orderHistory',
+          options: { strictPopulate: false }
+        }
+      ]);
+    } catch (populateError) {
+      console.warn('Populate error in rooms API:', populateError);
+      // Return rooms without populated data if populate fails
+      populatedRooms = rooms;
+    }
 
     return NextResponse.json({
       success: true,
-      count: rooms.length,
-      data: rooms,
+      count: populatedRooms.length,
+      data: populatedRooms,
     });
   } catch (error: any) {
     console.error('GET /api/rooms - Error:', error);

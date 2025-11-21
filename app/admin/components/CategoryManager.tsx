@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { toast } from '@/hooks/use-toast';
-import { Trash2, Plus, Edit2, X, Upload } from 'lucide-react';
+import { Trash2, Plus, Edit2, X, Upload, ChevronDown, ChevronUp } from 'lucide-react';
 
 interface Category {
   _id: string;
@@ -28,6 +28,7 @@ export function CategoryManager({ onCategoryChange }: { onCategoryChange?: () =>
     image: '',
   });
   const [imagePreview, setImagePreview] = useState<string>('');
+  const [isExpanded, setIsExpanded] = useState(true);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const fetchCategories = async () => {
@@ -206,10 +207,20 @@ export function CategoryManager({ onCategoryChange }: { onCategoryChange?: () =>
   return (
     <Card className="p-4 sm:p-6 shadow-xl rounded-2xl border border-emerald-200/50 bg-emerald-50/70 backdrop-blur-md">
       <div className="flex items-center justify-between mb-4 pb-3 border-b border-emerald-100">
-        <h2 className="text-base sm:text-lg font-extrabold bg-gradient-to-r from-emerald-700 to-lime-500 bg-clip-text text-transparent">
-          Manage Categories
-        </h2>
-        {!isAddingNew && (
+        <button
+          onClick={() => setIsExpanded(!isExpanded)}
+          className="flex items-center gap-2 hover:bg-emerald-50/50 rounded-lg px-2 py-1 transition-colors"
+        >
+          {isExpanded ? (
+            <ChevronUp className="h-4 w-4 text-emerald-600" />
+          ) : (
+            <ChevronDown className="h-4 w-4 text-emerald-600" />
+          )}
+          <h2 className="text-base sm:text-lg font-extrabold bg-gradient-to-r from-emerald-700 to-lime-500 bg-clip-text text-transparent">
+            Manage Categories
+          </h2>
+        </button>
+        {!isAddingNew && isExpanded && (
           <button
             onClick={() => setIsAddingNew(true)}
             className="flex items-center gap-2 px-3 py-1.5 text-xs sm:text-sm bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg transition-colors"
@@ -220,127 +231,131 @@ export function CategoryManager({ onCategoryChange }: { onCategoryChange?: () =>
         )}
       </div>
 
-      {isAddingNew && (
-        <form onSubmit={handleAddCategory} className="mb-4 p-3 bg-white/60 rounded-lg border border-emerald-100">
-          <div className="space-y-2">
-            <div>
-              <input
-                type="text"
-                placeholder="Category name"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="w-full px-2 py-2 text-sm border border-emerald-200 rounded-lg bg-white/80 focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                disabled={loading}
-              />
-            </div>
-            <div>
-              <textarea
-                placeholder="Description (optional)"
-                value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                rows={2}
-                className="w-full px-2 py-2 text-sm border border-emerald-200 rounded-lg bg-white/80 focus:outline-none focus:ring-2 focus:ring-emerald-500 resize-none"
-                disabled={loading}
-              />
-            </div>
-            <div>
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                onChange={handleImageUpload}
-                className="hidden"
-                disabled={uploading || loading}
-              />
-              {!formData.image ? (
-                <button
-                  type="button"
-                  onClick={() => fileInputRef.current?.click()}
-                  disabled={uploading || loading}
-                  className="w-full px-2 py-2 text-xs border-2 border-dashed border-emerald-200 rounded-lg bg-white/60 focus:outline-none focus:ring-2 focus:ring-emerald-500 hover:border-emerald-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1 text-emerald-700"
-                >
-                  <Upload className="h-3 w-3" />
-                  {uploading ? 'Uploading...' : 'Upload image'}
-                </button>
-              ) : null}
-              {formData.image && (
-                <div className="relative rounded-lg overflow-hidden border border-emerald-200 mt-2">
-                  <img
-                    src={formData.image}
-                    alt="Preview"
-                    className="w-full h-24 object-cover"
+      {isExpanded && (
+        <>
+          {isAddingNew && (
+            <form onSubmit={handleAddCategory} className="mb-4 p-3 bg-white/60 rounded-lg border border-emerald-100">
+              <div className="space-y-2">
+                <div>
+                  <input
+                    type="text"
+                    placeholder="Category name"
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    className="w-full px-2 py-2 text-sm border border-emerald-200 rounded-lg bg-white/80 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    disabled={loading}
                   />
+                </div>
+                <div>
+                  <textarea
+                    placeholder="Description (optional)"
+                    value={formData.description}
+                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                    rows={2}
+                    className="w-full px-2 py-2 text-sm border border-emerald-200 rounded-lg bg-white/80 focus:outline-none focus:ring-2 focus:ring-emerald-500 resize-none"
+                    disabled={loading}
+                  />
+                </div>
+                <div>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    className="hidden"
+                    disabled={uploading || loading}
+                  />
+                  {!formData.image ? (
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={uploading || loading}
+                      className="w-full px-2 py-2 text-xs border-2 border-dashed border-emerald-200 rounded-lg bg-white/60 focus:outline-none focus:ring-2 focus:ring-emerald-500 hover:border-emerald-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1 text-emerald-700"
+                    >
+                      <Upload className="h-3 w-3" />
+                      {uploading ? 'Uploading...' : 'Upload image'}
+                    </button>
+                  ) : null}
+                  {formData.image && (
+                    <div className="relative rounded-lg overflow-hidden border border-emerald-200 mt-2">
+                      <img
+                        src={formData.image}
+                        alt="Preview"
+                        className="w-full h-24 object-cover"
+                      />
+                      <button
+                        type="button"
+                        onClick={handleRemoveImage}
+                        disabled={uploading || loading}
+                        className="absolute top-1 right-1 bg-red-500 hover:bg-red-600 text-white rounded-full p-1 transition-colors disabled:opacity-50"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </div>
+                  )}
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="flex-1 px-3 py-2 text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg transition-colors disabled:opacity-50"
+                  >
+                    {loading ? 'Creating...' : 'Create'}
+                  </button>
                   <button
                     type="button"
-                    onClick={handleRemoveImage}
-                    disabled={uploading || loading}
-                    className="absolute top-1 right-1 bg-red-500 hover:bg-red-600 text-white rounded-full p-1 transition-colors disabled:opacity-50"
+                    onClick={() => {
+                      setIsAddingNew(false);
+                      setFormData({ name: '', description: '', image: '' });
+                      setImagePreview('');
+                    }}
+                    className="px-3 py-2 text-xs font-semibold bg-gray-300 hover:bg-gray-400 text-gray-800 rounded-lg transition-colors"
                   >
-                    <X className="h-3 w-3" />
+                    Cancel
                   </button>
                 </div>
-              )}
-            </div>
-            <div className="flex gap-2">
-              <button
-                type="submit"
-                disabled={loading}
-                className="flex-1 px-3 py-2 text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg transition-colors disabled:opacity-50"
-              >
-                {loading ? 'Creating...' : 'Create'}
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setIsAddingNew(false);
-                  setFormData({ name: '', description: '', image: '' });
-                  setImagePreview('');
-                }}
-                className="px-3 py-2 text-xs font-semibold bg-gray-300 hover:bg-gray-400 text-gray-800 rounded-lg transition-colors"
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        </form>
-      )}
-
-      <div className="space-y-2 max-h-96 overflow-y-auto">
-        {categories.length === 0 ? (
-          <p className="text-sm text-emerald-700/70 text-center py-4">No categories yet. Add one to get started!</p>
-        ) : (
-          categories.map((category) => (
-            <div
-              key={category._id}
-              className="flex items-center gap-3 p-3 bg-white/60 rounded-lg border border-emerald-100 hover:border-emerald-200 transition-colors"
-            >
-              {category.image && (
-                <div className="w-12 h-12 rounded-lg overflow-hidden border border-emerald-200 flex-shrink-0">
-                  <img
-                    src={category.image}
-                    alt={category.name}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              )}
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-emerald-900 truncate">{category.name}</p>
-                {category.description && (
-                  <p className="text-xs text-emerald-700/70 truncate">{category.description}</p>
-                )}
               </div>
-              <button
-                onClick={() => handleDeleteCategory(category.slug, category.name)}
-                disabled={loading}
-                className="ml-2 p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50 flex-shrink-0"
-                title="Delete category"
-              >
-                <Trash2 className="h-4 w-4" />
-              </button>
-            </div>
-          ))
-        )}
-      </div>
+            </form>
+          )}
+
+          <div className="space-y-2 max-h-96 overflow-y-auto">
+            {categories.length === 0 ? (
+              <p className="text-sm text-emerald-700/70 text-center py-4">No categories yet. Add one to get started!</p>
+            ) : (
+              categories.map((category) => (
+                <div
+                  key={category._id}
+                  className="flex items-center gap-3 p-3 bg-white/60 rounded-lg border border-emerald-100 hover:border-emerald-200 transition-colors"
+                >
+                  {category.image && (
+                    <div className="w-12 h-12 rounded-lg overflow-hidden border border-emerald-200 flex-shrink-0">
+                      <img
+                        src={category.image}
+                        alt={category.name}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-emerald-900 truncate">{category.name}</p>
+                    {category.description && (
+                      <p className="text-xs text-emerald-700/70 truncate">{category.description}</p>
+                    )}
+                  </div>
+                  <button
+                    onClick={() => handleDeleteCategory(category.slug, category.name)}
+                    disabled={loading}
+                    className="ml-2 p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50 flex-shrink-0"
+                    title="Delete category"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                </div>
+              ))
+            )}
+          </div>
+        </>
+      )}
     </Card>
   );
 }
