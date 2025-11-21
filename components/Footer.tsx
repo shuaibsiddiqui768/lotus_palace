@@ -7,7 +7,6 @@ import { Button } from '@/components/ui/button';
 
 export default function Footer() {
   const handleAdminClick = () => {
-    // Clear admin login state to force fresh login
     if (typeof window !== 'undefined') {
       localStorage.removeItem('adminLoggedIn');
       localStorage.removeItem('adminData');
@@ -19,10 +18,11 @@ export default function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-[#b7e4c7] text-emerald-900 border-t border-emerald-300/70">
+    <footer className="bg-[#b7e4c7] text-emerald-900 border-t border-emerald-300/70 relative z-10">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
         <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 xl:grid-cols-4">
-          {/* Brand – logo only */}
+
+          {/* Brand – logo */}
           <div className="space-y-6">
             <div className="flex items-center">
               <img
@@ -134,27 +134,31 @@ export default function Footer() {
           </div>
 
           {/* Map */}
-          <div className="space-y-4">
+          <div className="space-y-4 relative z-20">
             <h3 className="text-lg font-semibold text-emerald-950">Find Us</h3>
+
             <a
               href="https://maps.app.goo.gl/CzTC1PfQCNGjz2aY9"
               target="_blank"
               rel="noopener noreferrer"
-              className="group relative block overflow-hidden rounded-3xl shadow-lg ring-1 ring-emerald-300/90"
+              className="group relative z-20 block overflow-hidden rounded-3xl shadow-lg ring-1 ring-emerald-300/90"
             >
               <iframe
                 title="Lotus Palace location"
                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3559.5555669936255!2d80.99665737528274!3d26.85403217668101!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x399be300504998e7%3A0x15a603a7d805b8d9!2sHotel%20Lotus%20Palace!5e0!3m2!1sen!2sin!4v1732099800000!5m2!1sen!2sin"
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
-                className="pointer-events-none h-56 w-full border-0"
+                className="pointer-events-auto h-56 w-full border-0 relative z-30"
               />
-              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/35 via-black/15 to-transparent transition-opacity group-hover:opacity-80" />
-              <div className="pointer-events-none absolute bottom-4 left-4 flex items-center gap-2 rounded-full bg-white/95 px-4 py-2 text-sm font-semibold text-emerald-800 shadow">
+
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/35 via-black/15 to-transparent z-10 transition-opacity group-hover:opacity-80" />
+
+              <div className="pointer-events-none absolute bottom-4 left-4 flex items-center gap-2 rounded-full bg-white/95 px-4 py-2 text-sm font-semibold text-emerald-800 shadow z-40">
                 <MapPin className="h-4 w-4" />
                 View on Google Maps
               </div>
             </a>
+
             <p className="text-sm text-emerald-900/85">
               Tap the map to open directions and plan your visit to Lotus Palace in Gomti Nagar, Lucknow.
             </p>

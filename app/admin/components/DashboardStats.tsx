@@ -5,9 +5,9 @@ import { ShoppingCart, Users, TrendingUp, DollarSign } from 'lucide-react';
 
 export function DashboardStats() {
   const stats = [
-    { label: 'Total Orders', value: '1,234', icon: ShoppingCart, color: 'from-orange-500 to-red-500' },
+    { label: 'Total Orders', value: '1,234', icon: ShoppingCart, color: 'from-emerald-500 to-green-500' },
     { label: 'Active Users', value: '567', icon: Users, color: 'from-emerald-500 to-green-500' },
-    { label: 'Total Revenue', value: '₹12,345', icon: DollarSign, color: 'from-orange-500 to-amber-500' },
+    { label: 'Total Revenue', value: '₹12,345', icon: DollarSign, color: 'from-emerald-500 to-lime-500' },
     { label: 'Growth', value: '+12.5%', icon: TrendingUp, color: 'from-purple-500 to-violet-500' },
   ];
 
@@ -18,12 +18,12 @@ export function DashboardStats() {
         return (
           <Card
             key={stat.label}
-            className="p-4 sm:p-6 shadow-xl rounded-2xl border-2 border-orange-200/50 bg-white/70 backdrop-blur-md hover:shadow-2xl transition-all"
+            className="p-4 sm:p-6 shadow-xl rounded-2xl border-2 border-emerald-200/50 bg-white/70 backdrop-blur-md hover:shadow-2xl transition-all"
           >
             <div className="flex items-start justify-between">
               <div>
                 <p className="text-gray-600 text-xs sm:text-sm font-medium">{stat.label}</p>
-                <p className="text-lg sm:text-xl md:text-2xl font-extrabold bg-gradient-to-r from-orange-700 to-amber-700 bg-clip-text text-transparent mt-1 sm:mt-2">
+                <p className="text-lg sm:text-xl md:text-2xl font-extrabold bg-gradient-to-r from-emerald-700 to-lime-600 bg-clip-text text-transparent mt-1 sm:mt-2">
                   {stat.value}
                 </p>
               </div>
@@ -35,7 +35,7 @@ export function DashboardStats() {
               </div>
             </div>
 
-            <div className="mt-4 h-1 w-full rounded-full bg-gradient-to-r from-transparent via-orange-400/60 to-transparent"></div>
+            <div className="mt-4 h-1 w-full rounded-full bg-gradient-to-r from-transparent via-emerald-400/60 to-transparent"></div>
           </Card>
         );
       })}

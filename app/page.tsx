@@ -95,7 +95,6 @@ export default function Home() {
         categories={categories}
         selectedCategory={selectedCategory}
         onSelectCategory={handleCategorySelect}
-        className="bg-gradient-to-r from-emerald-100 to-lime-100"
       />
       {loading ? (
         <div className="flex items-center justify-center py-20">
