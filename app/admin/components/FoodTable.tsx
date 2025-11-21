@@ -664,7 +664,7 @@ export function FoodTable({ refreshTrigger }: { refreshTrigger?: number }) {
                       variant="outline"
                       size="sm"
                       onClick={() => handleEdit(item)}
-                      className="text-blue-600 hover:text-blue-700 h-8 text-xs flex-1"
+                      className="text-orange-600 hover:text-orange-700 h-8 text-xs flex-1"
                     >
                       <Edit2 size={14} className="mr-1" />
                       Edit

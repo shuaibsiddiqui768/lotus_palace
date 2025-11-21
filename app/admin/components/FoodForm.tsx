@@ -3,7 +3,13 @@
 import { useState, useRef } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { toast } from '@/hooks/use-toast';
 import { Upload, X } from 'lucide-react';
 
@@ -25,14 +31,6 @@ export function FoodForm({ onFoodAdded }: { onFoodAdded?: () => void }) {
     setFormData((prev) => ({
       ...prev,
       [name]: value,
-    }));
-  };
-
-  const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, checked } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: checked,
     }));
   };
 
@@ -139,12 +137,10 @@ export function FoodForm({ onFoodAdded }: { onFoodAdded?: () => void }) {
         price: parseFloat(formData.price),
         description: formData.description.trim(),
         image: formData.image.trim(),
-        preparationTime: 30, // Default value
-        spicy: false, // Default value
-        vegetarian: false, // Default value
+        preparationTime: 30,
+        spicy: false,
+        vegetarian: false,
       };
-
-      console.log('Submitting food item:', payload);
 
       const response = await fetch('/api/food', {
         method: 'POST',
@@ -155,7 +151,6 @@ export function FoodForm({ onFoodAdded }: { onFoodAdded?: () => void }) {
       });
 
       const data = await response.json();
-      console.log('Response:', data);
 
       if (!response.ok) {
         if (data.errors && Array.isArray(data.errors)) {
@@ -191,13 +186,13 @@ export function FoodForm({ onFoodAdded }: { onFoodAdded?: () => void }) {
   };
 
   return (
-    <Card className="p-4 sm:p-6 sticky top-0 sm:top-6 mx-auto max-w-full shadow-xl rounded-2xl border-2 border-orange-200/50 bg-white/70 backdrop-blur-md">
-      <h2 className="text-base sm:text-lg font-extrabold bg-gradient-to-r from-orange-600 to-amber-600 bg-clip-text text-transparent mb-3 sm:mb-4">
+    <Card className="p-4 sm:p-6 sticky top-0 sm:top-6 mx-auto max-w-full shadow-xl rounded-2xl border border-emerald-200/50 bg-emerald-50/70 backdrop-blur-md">
+      <h2 className="text-base sm:text-lg font-extrabold bg-gradient-to-r from-emerald-700 to-lime-500 bg-clip-text text-transparent mb-3 sm:mb-4">
         Add New Food Item
       </h2>
       <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
         <div>
-          <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-xs sm:text-sm font-medium text-emerald-900 mb-1">
             Food Name *
           </label>
           <input
@@ -206,17 +201,21 @@ export function FoodForm({ onFoodAdded }: { onFoodAdded?: () => void }) {
             value={formData.name}
             onChange={handleChange}
             placeholder="Enter food name"
-            className="w-full px-3 py-2 text-sm border border-orange-200 rounded-lg bg-white/70 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent placeholder:text-gray-400"
+            className="w-full px-3 py-2 text-sm border border-emerald-200 rounded-lg bg-white/80 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent placeholder:text-emerald-400"
             disabled={loading}
           />
         </div>
 
         <div>
-          <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-xs sm:text-sm font-medium text-emerald-900 mb-1">
             Category *
           </label>
-          <Select value={formData.category} onValueChange={handleCategoryChange} disabled={loading}>
-            <SelectTrigger className="w-full text-sm h-10 border-orange-200 bg-white/70 backdrop-blur-sm focus:ring-2 focus:ring-orange-500">
+          <Select
+            value={formData.category}
+            onValueChange={handleCategoryChange}
+            disabled={loading}
+          >
+            <SelectTrigger className="w-full text-sm h-10 border-emerald-200 bg-white/80 backdrop-blur-sm focus:ring-2 focus:ring-emerald-500">
               <SelectValue placeholder="Select category" />
             </SelectTrigger>
             <SelectContent className="rounded-lg shadow-lg">
@@ -231,11 +230,11 @@ export function FoodForm({ onFoodAdded }: { onFoodAdded?: () => void }) {
         </div>
 
         <div>
-          <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-xs sm:text-sm font-medium text-emerald-900 mb-1">
             Price *
           </label>
           <div className="flex items-center gap-2">
-            <span className="text-gray-600">₹</span>
+            <span className="text-emerald-600">₹</span>
             <input
               type="number"
               name="price"
@@ -244,14 +243,14 @@ export function FoodForm({ onFoodAdded }: { onFoodAdded?: () => void }) {
               placeholder="0"
               step="1"
               min="0"
-              className="flex-1 px-3 py-2 text-sm border border-orange-200 rounded-lg bg-white/70 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent placeholder:text-gray-400"
+              className="flex-1 px-3 py-2 text-sm border border-emerald-200 rounded-lg bg-white/80 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent placeholder:text-emerald-400"
               disabled={loading}
             />
           </div>
         </div>
 
         <div>
-          <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-xs sm:text-sm font-medium text-emerald-900 mb-1">
             Description
           </label>
           <textarea
@@ -260,13 +259,13 @@ export function FoodForm({ onFoodAdded }: { onFoodAdded?: () => void }) {
             onChange={handleChange}
             placeholder="Enter food description"
             rows={3}
-            className="w-full px-3 py-2 text-sm border border-orange-200 rounded-lg bg-white/70 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent placeholder:text-gray-400 resize-none"
+            className="w-full px-3 py-2 text-sm border border-emerald-200 rounded-lg bg-white/80 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent placeholder:text-emerald-400 resize-none"
             disabled={loading}
           />
         </div>
 
         <div>
-          <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-xs sm:text-sm font-medium text-emerald-900 mb-1">
             Food Image
           </label>
           <input
@@ -282,21 +281,21 @@ export function FoodForm({ onFoodAdded }: { onFoodAdded?: () => void }) {
               type="button"
               onClick={() => fileInputRef.current?.click()}
               disabled={uploading || loading}
-              className="w-full px-3 py-5 text-sm border-2 border-dashed border-orange-200 rounded-lg bg-white/60 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-orange-500 hover:border-orange-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-gray-700"
+              className="w-full px-3 py-5 text-sm border-2 border-dashed border-emerald-200 rounded-lg bg-white/60 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 hover:border-emerald-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-emerald-700"
             >
               <Upload className="h-4 w-4" />
               {uploading ? 'Uploading...' : 'Click to upload image'}
             </button>
           ) : null}
-          <p className="text-xs text-gray-500 mt-1">
+          <p className="text-xs text-emerald-700 mt-1">
             {uploading ? 'Uploading image...' : 'Upload image files up to 5MB'}
           </p>
         </div>
 
         {formData.image && (
           <div>
-            <p className="text-xs sm:text-sm font-medium text-gray-700 mb-1">Preview</p>
-            <div className="relative rounded-lg overflow-hidden border border-orange-200">
+            <p className="text-xs sm:text-sm font-medium text-emerald-900 mb-1">Preview</p>
+            <div className="relative rounded-lg overflow-hidden border border-emerald-200">
               <img
                 src={formData.image}
                 alt="Preview"
@@ -311,15 +310,13 @@ export function FoodForm({ onFoodAdded }: { onFoodAdded?: () => void }) {
                 <X className="h-4 w-4" />
               </button>
             </div>
-            <p className="text-xs text-gray-500 mt-1">
-              Image uploaded successfully to Cloudinary
-            </p>
+            <p className="text-xs text-emerald-700 mt-1">Image uploaded successfully to Cloudinary</p>
           </div>
         )}
 
         <Button
           type="submit"
-          className="w-full h-10 text-sm font-semibold bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 text-white shadow-lg rounded-lg transition-all"
+          className="w-full h-10 text-sm font-semibold bg-gradient-to-r from-emerald-700 to-lime-500 hover:from-emerald-800 hover:to-lime-600 text-white shadow-lg rounded-xl transition-all"
           disabled={loading}
         >
           {loading ? 'Adding...' : 'Add Food Item'}

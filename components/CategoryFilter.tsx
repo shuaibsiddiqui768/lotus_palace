@@ -9,6 +9,7 @@ interface CategoryFilterProps {
   categories: Category[];
   selectedCategory: string;
   onSelectCategory: (slug: string) => void;
+  className?: string;
 }
 
 const categoryImages: Record<string, string> = {
@@ -25,6 +26,7 @@ export default function CategoryFilter({
   categories,
   selectedCategory,
   onSelectCategory,
+  className,
 }: CategoryFilterProps) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
@@ -36,7 +38,7 @@ export default function CategoryFilter({
   };
 
   return (
-    <div className="border-b border-emerald-100/60 top-16 sm:top-20 z-40">
+    <div className={cn("border-b border-emerald-100/60 top-16 sm:top-20 z-40", className)}>
       {/* Section with lotus-themed spacing */}
       <div className="w-full px-4 sm:px-6 lg:px-10 xl:px-14 py-8 sm:py-10 lg:py-12">
         {/* Centered heading in emerald theme */}

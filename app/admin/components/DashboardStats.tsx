@@ -5,7 +5,7 @@ import { ShoppingCart, Users, TrendingUp, DollarSign } from 'lucide-react';
 
 export function DashboardStats() {
   const stats = [
-    { label: 'Total Orders', value: '1,234', icon: ShoppingCart, color: 'from-blue-500 to-sky-500' },
+    { label: 'Total Orders', value: '1,234', icon: ShoppingCart, color: 'from-orange-500 to-red-500' },
     { label: 'Active Users', value: '567', icon: Users, color: 'from-emerald-500 to-green-500' },
     { label: 'Total Revenue', value: '₹12,345', icon: DollarSign, color: 'from-orange-500 to-amber-500' },
     { label: 'Growth', value: '+12.5%', icon: TrendingUp, color: 'from-purple-500 to-violet-500' },

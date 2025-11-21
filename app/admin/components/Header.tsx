@@ -50,7 +50,9 @@ export function Header() {
       return;
     }
     window.localStorage.setItem(ORDER_UNREAD_COUNT_STORAGE_KEY, count.toString());
-    window.dispatchEvent(new CustomEvent('admin-order-unread-count', { detail: count }));
+    window.dispatchEvent(
+      new CustomEvent('admin-order-unread-count', { detail: count })
+    );
   }, []);
 
   const loadNotifications = useCallback(async () => {
@@ -76,7 +78,9 @@ export function Header() {
         }));
         const allIdsSet = new Set(mapped.map((item) => item.id));
         dismissedNotificationsRef.current = new Set(
-          Array.from(dismissedNotificationsRef.current).filter((id) => allIdsSet.has(id))
+          Array.from(dismissedNotificationsRef.current).filter((id) =>
+            allIdsSet.has(id)
+          )
         );
         persistDismissedNotifications();
         const unread = mapped.filter(
@@ -173,19 +177,24 @@ export function Header() {
     persistDismissedNotifications();
   }, [notifications, persistDismissedNotifications, broadcastUnreadCount]);
 
-  const handleDismissNotification = useCallback((id: string) => {
-    dismissedNotificationsRef.current.add(id);
-    setNotifications((previous) => {
-      const next = previous.filter((notification) => notification.id !== id);
-      previousIdsRef.current = previousIdsRef.current.filter((previousId) => previousId !== id);
-      if (next.length === 0) {
-        setHasNewNotification(false);
-      }
-      broadcastUnreadCount(next.length);
-      return next;
-    });
-    persistDismissedNotifications();
-  }, [persistDismissedNotifications, broadcastUnreadCount]);
+  const handleDismissNotification = useCallback(
+    (id: string) => {
+      dismissedNotificationsRef.current.add(id);
+      setNotifications((previous) => {
+        const next = previous.filter((notification) => notification.id !== id);
+        previousIdsRef.current = previousIdsRef.current.filter(
+          (previousId) => previousId !== id
+        );
+        if (next.length === 0) {
+          setHasNewNotification(false);
+        }
+        broadcastUnreadCount(next.length);
+        return next;
+      });
+      persistDismissedNotifications();
+    },
+    [persistDismissedNotifications, broadcastUnreadCount]
+  );
 
   useEffect(() => {
     if (typeof window === 'undefined') {
@@ -201,17 +210,17 @@ export function Header() {
   }, [handleMarkAllAsRead]);
 
   return (
-    <header className="border-b border-orange-200 bg-gradient-to-r from-white to-orange-50 sticky top-0 z-10">
+    <header className="border-b border-emerald-100 bg-gradient-to-r from-emerald-50 via-white to-emerald-50 sticky top-0 z-10">
       <div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4">
         {/* Mobile: Search icon, Desktop: Search input */}
         <div className="flex items-center gap-2 md:gap-4 ml-10 md:ml-0">
           {showSearch ? (
-            <div className="absolute inset-0 bg-orange-50 z-20 flex items-center px-4 py-3">
+            <div className="absolute inset-0 bg-emerald-50 z-20 flex items-center px-4 py-3">
               <input
                 type="search"
                 placeholder="Search..."
                 autoFocus
-                className="flex-1 px-3 py-1.5 bg-orange-50 border border-orange-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
+                className="flex-1 px-3 py-1.5 bg-emerald-50 border border-emerald-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
               />
               <Button
                 variant="ghost"
@@ -227,7 +236,7 @@ export function Header() {
               <Button
                 variant="ghost"
                 size="icon"
-                className="md:hidden"
+                className="md:hidden text-emerald-700"
                 onClick={() => setShowSearch(true)}
               >
                 <Search size={18} />
@@ -235,7 +244,7 @@ export function Header() {
               <input
                 type="search"
                 placeholder="Search..."
-                className="hidden md:block w-48 lg:w-64 px-3 py-1.5 text-sm bg-orange-50 border border-orange-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                className="hidden md:block w-48 lg:w-64 px-3 py-1.5 text-sm bg-emerald-50 border border-emerald-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
               />
             </>
           )}
@@ -256,12 +265,14 @@ export function Header() {
               <Button
                 variant="ghost"
                 size="icon"
-                className={`relative h-8 w-8 ${hasNewNotification ? 'text-orange-600' : ''}`}
+                className={`relative h-8 w-8 ${
+                  hasNewNotification ? 'text-emerald-700' : ''
+                }`}
               >
                 <Bell size={18} />
                 {notifications.length > 0 && (
                   <Badge
-                    className={`absolute -top-1 -right-1 flex h-5 min-w-[1.25rem] items-center justify-center bg-orange-500 px-1 text-xs text-white ${
+                    className={`absolute -top-1 -right-1 flex h-5 min-w-[1.25rem] items-center justify-center bg-emerald-500 px-1 text-xs text-white ${
                       hasNewNotification ? 'animate-pulse' : ''
                     }`}
                   >
@@ -274,7 +285,7 @@ export function Header() {
               <DropdownMenuLabel className="flex items-center justify-between">
                 Notifications
                 {notifications.length > 0 ? (
-                  <span className="text-xs font-medium text-gray-500">
+                  <span className="text-xs font-medium text-emerald-700">
                     {notifications.length}
                   </span>
                 ) : null}
@@ -282,34 +293,37 @@ export function Header() {
               <DropdownMenuSeparator />
               <div className="max-h-72 overflow-y-auto">
                 {notifications.length === 0 ? (
-                  <div className="px-3 py-6 text-sm text-gray-500">No new orders</div>
+                  <div className="px-3 py-6 text-sm text-emerald-700">
+                    No new orders
+                  </div>
                 ) : (
                   notifications.map((notification) => (
                     <div
                       key={notification.id}
-                      className="px-3 py-2 rounded-md hover:bg-orange-50 transition-colors"
+                      className="px-3 py-2 rounded-md hover:bg-emerald-50 transition-colors"
                     >
                       <div className="flex items-start justify-between gap-2">
                         <div className="space-y-1">
                           <div className="flex items-center gap-2">
-                            <span className="text-sm font-semibold text-gray-900">
+                            <span className="text-sm font-semibold text-emerald-900">
                               Order #{notification.id.slice(-6).toUpperCase()}
                             </span>
-                            <span className="text-xs text-gray-500">
+                            <span className="text-xs text-emerald-800/70">
                               {formatTime(notification.createdAt)}
                             </span>
                           </div>
-                          <div className="text-xs text-gray-600">
-                            {notification.customerName} • {formatOrderType(notification.orderType)}
+                          <div className="text-xs text-emerald-800/80">
+                            {notification.customerName} •{' '}
+                            {formatOrderType(notification.orderType)}
                           </div>
-                          <div className="text-xs text-gray-600">
+                          <div className="text-xs text-emerald-900 font-medium">
                             ₹{notification.total.toFixed(0)}
                           </div>
                         </div>
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-6 w-6 text-gray-400 hover:text-gray-600"
+                          className="h-6 w-6 text-emerald-400 hover:text-emerald-700"
                           onClick={(event) => {
                             event.preventDefault();
                             event.stopPropagation();
@@ -345,13 +359,17 @@ export function Header() {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          <Button variant="ghost" size="icon" className="h-8 w-8">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 text-emerald-700 hover:bg-emerald-50"
+          >
             <User size={18} />
           </Button>
           <Button
             variant="ghost"
             size="icon"
-            className="h-8 w-8"
+            className="h-8 w-8 text-emerald-700 hover:bg-emerald-50"
             onClick={() => {
               if (typeof window !== 'undefined') {
                 localStorage.removeItem('adminToken');

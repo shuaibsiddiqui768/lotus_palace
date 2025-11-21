@@ -88,13 +88,14 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-emerald-50 via-white to-lime-50">
       <Navbar />
       <Banner onOrderClick={() => setShowOrderForm(true)} onViewMenuClick={handleViewMenu} />
       <CategoryFilter
         categories={categories}
         selectedCategory={selectedCategory}
         onSelectCategory={handleCategorySelect}
+        className="bg-gradient-to-r from-emerald-100 to-lime-100"
       />
       {loading ? (
         <div className="flex items-center justify-center py-20">
@@ -113,7 +114,7 @@ export default function Home() {
           </div>
         </div>
       ) : (
-        <div data-section="menu">
+        <div data-section="menu" className="max-w-7xl mx-auto p-4">
           <FoodMenu items={filteredItems} />
         </div>
       )}

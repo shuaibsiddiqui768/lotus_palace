@@ -3,7 +3,20 @@
 import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, ShoppingCart, Table2, QrCode, Settings, CreditCard, UtensilsCrossed, Menu, X, Ticket, ChevronLeft, ChevronRight } from 'lucide-react';
+import {
+  LayoutDashboard,
+  ShoppingCart,
+  Table2,
+  QrCode,
+  Settings,
+  CreditCard,
+  UtensilsCrossed,
+  Menu,
+  X,
+  Ticket,
+  ChevronLeft,
+  ChevronRight,
+} from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 
@@ -27,7 +40,7 @@ export function Sidebar() {
     { href: '/admin/coupon', label: 'Coupons', icon: Ticket },
     { href: '/admin/qr', label: 'QR Code for Rooms', icon: QrCode },
     { href: '/admin/settings', label: 'Settings', icon: Settings },
-    { href: '/admin/payment-settings', label: 'Payment Settings', icon: CreditCard },
+    // { href: '/admin/payment-settings', label: 'Payment Settings', icon: CreditCard },
   ];
 
   useEffect(() => {
@@ -101,10 +114,20 @@ export function Sidebar() {
         const nextOccupied = isOnManageRoomPage ? 0 : occupied;
         setRoomAssignedCount(nextAssigned);
         setRoomOccupiedCount(nextOccupied);
-        window.localStorage.setItem(ROOM_ASSIGNED_COUNT_STORAGE_KEY, nextAssigned.toString());
-        window.localStorage.setItem(ROOM_OCCUPIED_COUNT_STORAGE_KEY, nextOccupied.toString());
-        window.dispatchEvent(new CustomEvent('admin-room-assigned-count', { detail: nextAssigned }));
-        window.dispatchEvent(new CustomEvent('admin-room-occupied-count', { detail: nextOccupied }));
+        window.localStorage.setItem(
+          ROOM_ASSIGNED_COUNT_STORAGE_KEY,
+          nextAssigned.toString()
+        );
+        window.localStorage.setItem(
+          ROOM_OCCUPIED_COUNT_STORAGE_KEY,
+          nextOccupied.toString()
+        );
+        window.dispatchEvent(
+          new CustomEvent('admin-room-assigned-count', { detail: nextAssigned })
+        );
+        window.dispatchEvent(
+          new CustomEvent('admin-room-occupied-count', { detail: nextOccupied })
+        );
       } catch (error) {
         console.error('Error loading room counts', error);
       }
@@ -145,8 +168,12 @@ export function Sidebar() {
     if (typeof window !== 'undefined') {
       window.localStorage.setItem(ROOM_OCCUPIED_COUNT_STORAGE_KEY, '0');
       window.localStorage.setItem(ROOM_ASSIGNED_COUNT_STORAGE_KEY, '0');
-      window.dispatchEvent(new CustomEvent('admin-room-occupied-count', { detail: 0 }));
-      window.dispatchEvent(new CustomEvent('admin-room-assigned-count', { detail: 0 }));
+      window.dispatchEvent(
+        new CustomEvent('admin-room-occupied-count', { detail: 0 })
+      );
+      window.dispatchEvent(
+        new CustomEvent('admin-room-assigned-count', { detail: 0 })
+      );
     }
     setRoomOccupiedCount(0);
     setRoomAssignedCount(0);
@@ -178,7 +205,7 @@ export function Sidebar() {
         variant="ghost"
         size="icon"
         onClick={toggleSidebar}
-        className="fixed top-4 left-4 z-50 md:hidden text-orange-600 bg-white/90 border border-orange-100 shadow-sm hover:bg-orange-50"
+        className="fixed top-4 left-4 z-50 md:hidden text-emerald-700 bg-white/90 border border-emerald-100 shadow-sm hover:bg-emerald-50"
       >
         <Menu size={24} />
       </Button>
@@ -194,28 +221,27 @@ export function Sidebar() {
       {/* Sidebar */}
       <aside
         className={cn(
-          "bg-gradient-to-b from-orange-50 via-white to-white border-r border-orange-100/80 p-4 sm:p-6 z-50 shadow-sm transition-all duration-300 ease-in-out",
-          "fixed md:static h-full",
-          isOpen ? "left-0" : "-left-full md:left-0",
-          "w-64",
-          isCollapsed ? "md:w-20 md:p-4" : "md:w-64"
+          'bg-gradient-to-b from-emerald-50 via-white to-emerald-50 border-r border-emerald-100/80 p-4 sm:p-6 z-50 shadow-sm transition-all duration-300 ease-in-out',
+          'fixed md:static h-full',
+          isOpen ? 'left-0' : '-left-full md:left-0',
+          'w-64',
+          isCollapsed ? 'md:w-20 md:p-4' : 'md:w-64'
         )}
       >
         <div className="flex items-center justify-between mb-6">
           <Link
             href="/admin"
             className={cn(
-              "flex items-center gap-3 text-orange-600 hover:opacity-80 transition-opacity",
-              isCollapsed ? "md:justify-center md:gap-0" : ""
+              'flex items-center gap-3 text-emerald-700 hover:opacity-80 transition-opacity',
+              isCollapsed ? 'md:justify-center md:gap-0' : ''
             )}
           >
-            {/* <div className="bg-gradient-to-r from-orange-500 to-red-500 p-2 rounded-lg">
-              <span className="text-white text-lg font-bold">🍕</span>
-            </div> */}
             {!isCollapsed && (
               <div className="flex flex-col leading-tight">
-                <span className="text-xs font-medium uppercase text-orange-600">Admin</span>
-                <span className="text-xl font-bold text-orange-600">FoodHub</span>
+                <span className="text-xs font-medium uppercase text-emerald-600">
+                  Admin
+                </span>
+                <span className="text-xl font-bold text-emerald-700">Lotus Palace</span>
               </div>
             )}
           </Link>
@@ -225,7 +251,7 @@ export function Sidebar() {
               variant="ghost"
               size="icon"
               onClick={toggleCollapse}
-              className="hidden md:flex text-orange-600 hover:bg-orange-50"
+              className="hidden md:flex text-emerald-700 hover:bg-emerald-50"
             >
               {isCollapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
             </Button>
@@ -233,7 +259,7 @@ export function Sidebar() {
               variant="ghost"
               size="icon"
               onClick={toggleSidebar}
-              className="md:hidden text-orange-600 hover:bg-orange-50"
+              className="md:hidden text-emerald-700 hover:bg-emerald-50"
             >
               <X size={20} />
             </Button>
@@ -245,9 +271,12 @@ export function Sidebar() {
             const isActive = pathname === href;
             const isOrdersLink = href === '/admin/orders';
             const isManageRoomLink = href === '/admin/manage-room';
-            const orderBadgeValue = orderUnreadCount > 9 ? '9+' : orderUnreadCount.toString();
-            const roomBadgeCount = roomAssignedCount > 0 ? roomAssignedCount : roomOccupiedCount;
-            const roomBadgeValue = roomBadgeCount > 9 ? '9+' : roomBadgeCount.toString();
+            const orderBadgeValue =
+              orderUnreadCount > 9 ? '9+' : orderUnreadCount.toString();
+            const roomBadgeCount =
+              roomAssignedCount > 0 ? roomAssignedCount : roomOccupiedCount;
+            const roomBadgeValue =
+              roomBadgeCount > 9 ? '9+' : roomBadgeCount.toString();
             const showOrderBadge = isOrdersLink && orderUnreadCount > 0;
             const showRoomBadge = isManageRoomLink && roomBadgeCount > 0;
             return (
@@ -267,8 +296,8 @@ export function Sidebar() {
                   'relative flex items-center rounded-xl transition-all duration-200 text-sm',
                   isCollapsed ? 'justify-center px-2 py-2' : 'gap-3 px-3 py-2',
                   isActive
-                    ? 'bg-orange-500/15 text-orange-600 font-semibold shadow-sm'
-                    : 'text-slate-600 hover:bg-orange-50 hover:text-orange-600'
+                    ? 'bg-emerald-600/10 text-emerald-700 font-semibold shadow-sm'
+                    : 'text-slate-600 hover:bg-emerald-50 hover:text-emerald-700'
                 )}
               >
                 <div className="relative flex items-center justify-center">
@@ -279,7 +308,7 @@ export function Sidebar() {
                     </span>
                   ) : null}
                   {isCollapsed && showRoomBadge ? (
-                    <span className="absolute -top-1 -right-1 inline-flex h-4 min-w-[1rem] items-center justify-center rounded-full bg-orange-500 px-1 text-[10px] font-medium text-white">
+                    <span className="absolute -top-1 -right-1 inline-flex h-4 min-w-[1rem] items-center justify-center rounded-full bg-emerald-500 px-1 text-[10px] font-medium text-white">
                       {roomBadgeValue}
                     </span>
                   ) : null}
@@ -293,7 +322,7 @@ export function Sidebar() {
                       </span>
                     ) : null}
                     {showRoomBadge ? (
-                      <span className="ml-3 inline-flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-orange-500 px-2 text-xs font-medium text-white">
+                      <span className="ml-3 inline-flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-emerald-500 px-2 text-xs font-medium text-white">
                         {roomBadgeValue}
                       </span>
                     ) : null}

@@ -1,9 +1,15 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { toast } from '@/hooks/use-toast';
 import { Shuffle } from 'lucide-react';
 
@@ -175,13 +181,15 @@ export function CouponForm({ onCouponAdded }: { onCouponAdded?: () => void }) {
   };
 
   return (
-    <Card className="p-4 sm:p-6 sticky top-0 sm:top-6 mx-auto max-w-full shadow-xl rounded-2xl border-2 border-orange-200/50 bg-white/70 backdrop-blur-md">
-      <h2 className="text-base sm:text-lg font-extrabold bg-gradient-to-r from-orange-600 to-amber-600 bg-clip-text text-transparent mb-3 sm:mb-4">
+    <Card className="p-4 sm:p-6 sticky top-0 sm:top-6 mx-auto max-w-full shadow-xl rounded-2xl border border-emerald-300/40 bg-emerald-100/50 backdrop-blur-sm">
+      <h2 className="text-base sm:text-lg font-extrabold bg-gradient-to-r from-emerald-500 to-lime-400 bg-clip-text text-transparent mb-3 sm:mb-4">
         Create New Coupon
       </h2>
       <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
         <div>
-          <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Coupon Code *</label>
+          <label className="block text-xs sm:text-sm font-medium text-emerald-900 mb-1">
+            Coupon Code *
+          </label>
           <div className="flex gap-2">
             <input
               type="text"
@@ -189,7 +197,7 @@ export function CouponForm({ onCouponAdded }: { onCouponAdded?: () => void }) {
               value={formData.code}
               onChange={handleChange}
               placeholder="Enter coupon code"
-              className="flex-1 px-3 py-2 text-sm border border-orange-200 rounded-lg bg-white/70 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-orange-500 uppercase placeholder:text-gray-400"
+              className="flex-1 px-3 py-2 text-sm border border-emerald-300 rounded-lg bg-white/80 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-emerald-400 uppercase placeholder:text-emerald-500"
               disabled={loading}
             />
             <Button
@@ -198,18 +206,26 @@ export function CouponForm({ onCouponAdded }: { onCouponAdded?: () => void }) {
               variant="outline"
               size="sm"
               disabled={loading}
-              className="px-3 border-orange-300 text-orange-700 hover:text-white hover:bg-gradient-to-r hover:from-orange-600 hover:to-amber-600"
+              className="px-3 border-emerald-400 text-emerald-600 hover:text-white hover:bg-gradient-to-r hover:from-emerald-500 hover:to-lime-400"
             >
               <Shuffle className="h-4 w-4" />
             </Button>
           </div>
-          <p className="text-xs text-gray-500 mt-1">Click the shuffle icon to generate a random code</p>
+          <p className="text-xs text-emerald-700 mt-1">
+            Click the shuffle icon to generate a random code
+          </p>
         </div>
 
         <div>
-          <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Discount Type *</label>
-          <Select value={formData.discountType} onValueChange={handleDiscountTypeChange} disabled={loading}>
-            <SelectTrigger className="w-full text-sm h-10 border-orange-200 bg-white/70 backdrop-blur-sm focus:ring-2 focus:ring-orange-500">
+          <label className="block text-xs sm:text-sm font-medium text-emerald-900 mb-1">
+            Discount Type *
+          </label>
+          <Select
+            value={formData.discountType}
+            onValueChange={handleDiscountTypeChange}
+            disabled={loading}
+          >
+            <SelectTrigger className="w-full text-sm h-10 border-emerald-300 bg-white/80 backdrop-blur-sm focus:ring-2 focus:ring-emerald-400">
               <SelectValue placeholder="Select discount type" />
             </SelectTrigger>
             <SelectContent className="rounded-lg shadow-lg">
@@ -220,9 +236,13 @@ export function CouponForm({ onCouponAdded }: { onCouponAdded?: () => void }) {
         </div>
 
         <div>
-          <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Value *</label>
+          <label className="block text-xs sm:text-sm font-medium text-emerald-900 mb-1">
+            Value *
+          </label>
           <div className="flex items-center gap-2">
-            <span className="text-gray-600">{formData.discountType === 'percentage' ? '%' : '₹'}</span>
+            <span className="text-emerald-600">
+              {formData.discountType === 'percentage' ? '%' : '₹'}
+            </span>
             <input
               type="number"
               name="value"
@@ -232,39 +252,45 @@ export function CouponForm({ onCouponAdded }: { onCouponAdded?: () => void }) {
               step={formData.discountType === 'percentage' ? '1' : '0.01'}
               min="0"
               max={formData.discountType === 'percentage' ? '100' : undefined}
-              className="flex-1 px-3 py-2 text-sm border border-orange-200 rounded-lg bg-white/70 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-orange-500 placeholder:text-gray-400"
+              className="flex-1 px-3 py-2 text-sm border border-emerald-300 rounded-lg bg-white/80 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-emerald-400 placeholder:text-emerald-500"
               disabled={loading}
             />
           </div>
         </div>
 
         <div>
-          <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Expiry Date *</label>
+          <label className="block text-xs sm:text-sm font-medium text-emerald-900 mb-1">
+            Expiry Date *
+          </label>
           <input
             type="datetime-local"
             name="expiryDate"
             value={formData.expiryDate}
             onChange={handleChange}
-            className="w-full px-3 py-2 text-sm border border-orange-200 rounded-lg bg-white/70 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-orange-500 placeholder:text-gray-400"
+            className="w-full px-3 py-2 text-sm border border-emerald-300 rounded-lg bg-white/80 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-emerald-400 placeholder:text-emerald-500"
             disabled={loading}
           />
         </div>
 
         <div>
-          <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Description</label>
+          <label className="block text-xs sm:text-sm font-medium text-emerald-900 mb-1">
+            Description
+          </label>
           <textarea
             name="description"
             value={formData.description}
             onChange={handleChange}
             placeholder="Enter coupon description"
             rows={2}
-            className="w-full px-3 py-2 text-sm border border-orange-200 rounded-lg bg-white/70 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-orange-500 placeholder:text-gray-400 resize-none"
+            className="w-full px-3 py-2 text-sm border border-emerald-300 rounded-lg bg-white/80 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-emerald-400 placeholder:text-emerald-500 resize-none"
             disabled={loading}
           />
         </div>
 
         <div>
-          <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Minimum Order Amount (optional)</label>
+          <label className="block text-xs sm:text-sm font-medium text-emerald-900 mb-1">
+            Minimum Order Amount (optional)
+          </label>
           <input
             type="number"
             name="minimumOrderAmount"
@@ -273,14 +299,18 @@ export function CouponForm({ onCouponAdded }: { onCouponAdded?: () => void }) {
             placeholder="No minimum"
             min="0"
             step="0.01"
-            className="w-full px-3 py-2 text-sm border border-orange-200 rounded-lg bg-white/70 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-orange-500 placeholder:text-gray-400"
+            className="w-full px-3 py-2 text-sm border border-emerald-300 rounded-lg bg-white/80 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-emerald-400 placeholder:text-emerald-500"
             disabled={loading}
           />
-          <p className="text-xs text-gray-500 mt-1">Leave empty if no minimum order amount is required</p>
+          <p className="text-xs text-emerald-700 mt-1">
+            Leave empty if no minimum order amount is required
+          </p>
         </div>
 
         <div>
-          <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Usage Limit (optional)</label>
+          <label className="block text-xs sm:text-sm font-medium text-emerald-900 mb-1">
+            Usage Limit (optional)
+          </label>
           <input
             type="number"
             name="usageLimit"
@@ -288,15 +318,15 @@ export function CouponForm({ onCouponAdded }: { onCouponAdded?: () => void }) {
             onChange={handleChange}
             placeholder="Unlimited"
             min="1"
-            className="w-full px-3 py-2 text-sm border border-orange-200 rounded-lg bg-white/70 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-orange-500 placeholder:text-gray-400"
+            className="w-full px-3 py-2 text-sm border border-emerald-300 rounded-lg bg-white/80 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-emerald-400 placeholder:text-emerald-500"
             disabled={loading}
           />
-          <p className="text-xs text-gray-500 mt-1">Leave empty for unlimited usage</p>
+          <p className="text-xs text-emerald-700 mt-1">Leave empty for unlimited usage</p>
         </div>
 
         <Button
           type="submit"
-          className="w-full h-10 text-sm font-semibold bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 text-white shadow-lg rounded-lg transition-all"
+          className="w-full h-10 text-sm font-semibold bg-gradient-to-r from-emerald-500 to-lime-400 hover:from-emerald-600 hover:to-lime-500 text-white shadow-lg rounded-lg transition-all"
           disabled={loading}
         >
           {loading ? 'Creating...' : 'Create Coupon'}

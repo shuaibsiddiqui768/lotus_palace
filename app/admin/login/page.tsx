@@ -1,6 +1,6 @@
 'use client';
 
-import { FormEvent, useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Loader2, Eye, EyeOff } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -31,40 +31,31 @@ export default function AdminLoginPage() {
     let active = true;
 
     const verifySession = async () => {
-      if (typeof window === 'undefined') {
-        return;
-      }
+      if (typeof window === 'undefined') return;
 
       const token = window.localStorage.getItem('adminToken');
       if (!token) {
-        if (active) {
-          setIsCheckingSession(false);
-        }
+        if (active) setIsCheckingSession(false);
         return;
       }
 
       try {
         const response = await fetch('/api/admin/auth', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ mode: 'verify', token }),
         });
 
-        if (!active) {
-          return;
-        }
+        if (!active) return;
 
         if (response.ok) {
           const result: LoginResult = await response.json();
           if (result?.success) {
-            router.replace('/admin');
+            router.replace('/admin/dashboard');
             return;
           }
         }
-      } catch {
-      }
+      } catch {}
 
       if (typeof window !== 'undefined') {
         window.localStorage.removeItem('adminToken');
@@ -72,19 +63,14 @@ export default function AdminLoginPage() {
         window.localStorage.removeItem('adminData');
       }
 
-      if (active) {
-        setIsCheckingSession(false);
-      }
+      if (active) setIsCheckingSession(false);
     };
 
     verifySession();
-
-    return () => {
-      active = false;
-    };
+    return () => { active = false; };
   }, [router]);
 
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError(null);
     setIsSubmitting(true);
@@ -92,34 +78,25 @@ export default function AdminLoginPage() {
     try {
       const response = await fetch('/api/admin/auth', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          mode: 'login',
-          email,
-          password,
-        }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mode: 'login', email, password }),
       });
 
       const result: LoginResult = await response.json();
 
-      if (!response.ok || !result?.success || !result?.data?.token || !result?.data?.admin) {
+      if (!response.ok || !result?.success || !result?.data?.token || !result?.data?.admin)
         throw new Error(result?.message || 'Login failed');
-      }
 
       if (typeof window !== 'undefined') {
         window.localStorage.setItem('adminToken', result.data.token);
         if (result.data.expiresAt) {
           window.localStorage.setItem('adminTokenExpiresAt', result.data.expiresAt.toString());
-        } else {
-          window.localStorage.removeItem('adminTokenExpiresAt');
         }
         window.localStorage.setItem('adminData', JSON.stringify(result.data.admin));
         window.dispatchEvent(new Event('admin-login-change'));
       }
 
-      const redirectTo = searchParams?.get('redirect') || '/admin';
+      const redirectTo = searchParams?.get('redirect') || '/admin/dashboard';
       router.replace(redirectTo);
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Something went wrong';
@@ -131,8 +108,8 @@ export default function AdminLoginPage() {
 
   if (isCheckingSession) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gray-50">
-        <div className="flex items-center gap-2 text-gray-600">
+      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-[#e4f2e9] via-white to-[#f7efe6]">
+        <div className="flex items-center gap-2 text-emerald-700">
           <Loader2 className="h-5 w-5 animate-spin" />
           <span>Checking session...</span>
         </div>
@@ -141,67 +118,94 @@ export default function AdminLoginPage() {
   }
 
   return (
-    <div className="flex items-center justify-center px-4 py-16">
-      <div className="w-full max-w-md bg-white shadow-xl rounded-3xl border border-gray-100 p-8 space-y-6">
-        <div className="space-y-2 text-center">
-          <h1 className="text-3xl font-bold text-gray-900">Admin Login</h1>
-          <p className="text-gray-600">Access the admin panel</p>
+    <div className="flex items-center justify-center px-4 py-16 min-h-screen bg-gradient-to-br from-[#e4f2e9] via-white to-[#f7efe6]">
+      <div className="w-full max-w-md bg-white/80 backdrop-blur-lg border border-emerald-100 shadow-2xl rounded-3xl p-10 space-y-6 relative overflow-hidden">
+
+        {/* Decorative Lotus Theme Glow */}
+        <div className="absolute inset-0 bg-gradient-to-br from-emerald-100/40 via-transparent to-lime-100/40 pointer-events-none" />
+
+        {/* Heading */}
+        <div className="space-y-2 text-center relative">
+          <h1 className="text-4xl font-extrabold text-emerald-800 tracking-tight drop-shadow-sm">
+            Admin Login
+          </h1>
+          <p className="text-emerald-700 font-medium">Secure access to admin dashboard</p>
         </div>
-        <form onSubmit={handleSubmit} className="space-y-5">
+
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="space-y-5 relative">
+
+          {/* Email */}
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email" className="text-emerald-900 font-semibold">
+              Email Address
+            </Label>
             <Input
               id="email"
-              name="email"
               type="email"
               value={email}
-              onChange={(event) => setEmail(event.target.value)}
-              placeholder="admin@foodmenu.com"
+              onChange={(e) => setEmail(e.target.value)}
               required
               disabled={isSubmitting}
-              autoComplete="email"
+              className="bg-white/70 border-emerald-300 focus:ring-emerald-500 focus:border-emerald-500"
             />
           </div>
+
+          {/* Password Input + Eye Button FIXED */}
           <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password" className="text-emerald-900 font-semibold">
+              Password
+            </Label>
             <div className="relative">
               <Input
                 id="password"
-                name="password"
                 type={showPassword ? 'text' : 'password'}
                 value={password}
-                onChange={(event) => setPassword(event.target.value)}
-                placeholder="••••••••"
+                onChange={(e) => setPassword(e.target.value)}
                 required
                 disabled={isSubmitting}
-                autoComplete="current-password"
-                className="pr-10"
+                className="bg-white/70 border-emerald-300 focus:ring-emerald-500 focus:border-emerald-500 pr-12"
               />
+
+              {/* Eye Button - Correctly aligned */}
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
                 disabled={isSubmitting}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-emerald-500 hover:text-emerald-700 transition"
               >
-                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
               </button>
             </div>
           </div>
-          <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700" disabled={isSubmitting}>
+
+          {/* Login Button */}
+          <Button
+            type="submit"
+            disabled={isSubmitting}
+            className="w-full py-5 text-lg font-semibold bg-gradient-to-r from-emerald-600 to-lime-500 hover:from-emerald-700 hover:to-lime-600 text-white rounded-xl shadow-lg hover:shadow-xl transition-all"
+          >
             {isSubmitting ? (
               <div className="flex items-center justify-center gap-2">
-                <Loader2 className="h-4 w-4 animate-spin" />
-                <span>Signing in…</span>
+                <Loader2 className="h-5 w-5 animate-spin" />
+                Signing in…
               </div>
             ) : (
-              'Log in'
+              'Log In'
             )}
           </Button>
-          {error ? <p className="text-sm text-red-600 text-center">{error}</p> : null}
+
+          {error && (
+            <p className="text-center text-sm text-red-600 mt-2">
+              {error}
+            </p>
+          )}
         </form>
-        <div className="text-center text-sm text-gray-500">
-          Demo credentials: admin@foodmenu.com / admin123
-        </div>
+
+        {/* Demo Credentials */}
+        <p className="text-center text-sm text-emerald-700 font-medium">
+          Demo: <span className="underline">admin@foodmenu.com</span> / admin123
+        </p>
       </div>
     </div>
   );
