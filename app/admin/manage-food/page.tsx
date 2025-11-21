@@ -3,12 +3,18 @@
 import { useState } from 'react';
 import { FoodForm } from '../components/FoodForm';
 import { FoodTable } from '../components/FoodTable';
+import { CategoryManager } from '../components/CategoryManager';
 
 export default function ManageFood() {
   const [refreshKey, setRefreshKey] = useState(0);
+  const [categoryRefreshKey, setCategoryRefreshKey] = useState(0);
 
   const handleFoodAdded = () => {
     setRefreshKey((prev) => prev + 1);
+  };
+
+  const handleCategoryChange = () => {
+    setCategoryRefreshKey((prev) => prev + 1);
   };
 
   return (
@@ -34,8 +40,9 @@ export default function ManageFood() {
         </div>
 
         {/* Content */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
-          <div className="lg:col-span-1">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 lg:gap-8">
+          <div className="lg:col-span-1 space-y-6">
+            <CategoryManager onCategoryChange={handleCategoryChange} />
             <div className="rounded-2xl border border-emerald-100 bg-gradient-to-br from-white to-emerald-50/30 backdrop-blur-sm shadow-lg p-4 sm:p-5">
               <div className="mb-3 pb-3 border-b border-emerald-100">
                 <h2 className="text-lg font-bold bg-gradient-to-r from-emerald-700 to-lime-500 bg-clip-text text-transparent">
@@ -43,11 +50,11 @@ export default function ManageFood() {
                 </h2>
                 <p className="text-xs text-emerald-700/80">Create or update menu items</p>
               </div>
-              <FoodForm onFoodAdded={handleFoodAdded} />
+              <FoodForm onFoodAdded={handleFoodAdded} key={categoryRefreshKey} />
             </div>
           </div>
 
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-3">
             <div className="rounded-2xl border border-emerald-100 bg-gradient-to-br from-white to-emerald-50/30 backdrop-blur-sm shadow-lg p-4 sm:p-5">
               <div className="mb-3 pb-3 border-b border-emerald-100 flex items-center justify-between">
                 <h2 className="text-lg font-bold bg-gradient-to-r from-emerald-700 to-lime-500 bg-clip-text text-transparent">

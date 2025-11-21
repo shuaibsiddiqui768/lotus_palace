@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Food from '@/models/Food';
+import Category from '@/models/Category';
 
 export async function GET(request: NextRequest) {
   try {
@@ -77,14 +78,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validate category is one of the allowed values
-    const validCategories = ['pizza', 'burgers', 'pasta', 'salads', 'drinks', 'desserts'];
-    if (!validCategories.includes(category)) {
+    const existingCategory = await Category.findOne({
+      name: new RegExp(`^${category.trim()}$`, 'i'),
+    });
+    if (!existingCategory) {
       console.log(`POST /api/food - Validation failed: Invalid category "${category}"`);
       return NextResponse.json(
         {
           success: false,
-          message: `Invalid category. Must be one of: ${validCategories.join(', ')}`,
+          message: `Category "${category}" does not exist. Please create it first.`,
         },
         { status: 400 }
       );

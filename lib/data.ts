@@ -40,35 +40,86 @@ export interface MongoFoodItem {
   updatedAt: string;
 }
 
-export function mongoFoodToFoodItem(mongoFood: MongoFoodItem): FoodItem {
-  const categoryMap: Record<string, string> = {
-    'pizza': '2',
-    'burgers': '3',
-    'pasta': '4',
-    'salads': '5',
-    'drinks': '6',
-    'desserts': '7',
-  };
+export interface MongoCategoryItem {
+  _id: string;
+  name: string;
+  slug: string;
+  description?: string;
+  createdAt: string;
+  updatedAt: string;
+}
 
-  // Log the image URL for debugging
+let globalCategoryMap: Record<string, string> = {
+  'pizza': '2',
+  'burgers': '3',
+  'pasta': '4',
+  'salads': '5',
+  'drinks': '6',
+  'desserts': '7',
+};
+
+export function setCategoryMap(mongoCategories: MongoCategoryItem[]): void {
+  globalCategoryMap = { 'all': '1' };
+  mongoCategories.forEach((cat, index) => {
+    globalCategoryMap[cat.name.toLowerCase()] = String(index + 2);
+  });
+}
+
+export function mongoFoodToFoodItem(mongoFood: MongoFoodItem): FoodItem {
   console.log('Converting MongoDB food item to FoodItem:', {
     id: mongoFood._id,
     name: mongoFood.name,
     image: mongoFood.image
   });
 
-  // Price is already in INR, no need for conversion
+  const categoryId = globalCategoryMap[mongoFood.category.toLowerCase()] || '1';
+
   return {
     id: mongoFood._id,
     name: mongoFood.name,
     description: mongoFood.description || null,
     price: mongoFood.price,
     image_url: mongoFood.image || null,
-    category_id: categoryMap[mongoFood.category] || '1',
+    category_id: categoryId,
     is_available: mongoFood.available,
     created_at: mongoFood.createdAt,
     updated_at: mongoFood.updatedAt,
   };
+}
+
+export function mongoCategoriesToFrontendCategories(mongoCategories: MongoCategoryItem[]): Category[] {
+  const iconMap: Record<string, string> = {
+    'pizza': 'Pizza',
+    'burgers': 'Beef',
+    'pasta': 'Cookie',
+    'salads': 'Salad',
+    'drinks': 'Coffee',
+    'desserts': 'Cake',
+  };
+
+  const categories: Category[] = [
+    {
+      id: '1',
+      name: 'All',
+      slug: 'all',
+      icon: 'UtensilsCrossed',
+      display_order: 0,
+      created_at: new Date().toISOString(),
+    },
+  ];
+
+  mongoCategories.forEach((mongoCat, index) => {
+    categories.push({
+      id: String(index + 2),
+      name: mongoCat.name,
+      slug: mongoCat.slug,
+      icon: iconMap[mongoCat.slug] || 'UtensilsCrossed',
+      display_order: index + 1,
+      created_at: mongoCat.createdAt,
+    });
+  });
+
+  return categories;
 }
 
 export const categories: Category[] = [

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import {
@@ -11,7 +11,13 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { toast } from '@/hooks/use-toast';
-import { Upload, X } from 'lucide-react';
+import { Upload, X, ChevronDown } from 'lucide-react';
+
+interface Category {
+  _id: string;
+  name: string;
+  slug: string;
+}
 
 export function FoodForm({ onFoodAdded }: { onFoodAdded?: () => void }) {
   const [formData, setFormData] = useState({
@@ -24,7 +30,34 @@ export function FoodForm({ onFoodAdded }: { onFoodAdded?: () => void }) {
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [imagePreview, setImagePreview] = useState<string>('');
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [categoriesLoading, setCategoriesLoading] = useState(true);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
+  const fetchCategories = async () => {
+    try {
+      setCategoriesLoading(true);
+      const response = await fetch('/api/categories');
+      const data = await response.json();
+
+      if (data.success) {
+        setCategories(data.data);
+      }
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to load categories',
+        variant: 'destructive',
+      });
+    } finally {
+      setCategoriesLoading(false);
+    }
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -133,7 +166,7 @@ export function FoodForm({ onFoodAdded }: { onFoodAdded?: () => void }) {
 
       const payload = {
         name: formData.name.trim(),
-        category: formData.category,
+        category: formData.category.trim(),
         price: parseFloat(formData.price),
         description: formData.description.trim(),
         image: formData.image.trim(),
@@ -210,23 +243,33 @@ export function FoodForm({ onFoodAdded }: { onFoodAdded?: () => void }) {
           <label className="block text-xs sm:text-sm font-medium text-emerald-900 mb-1">
             Category *
           </label>
-          <Select
-            value={formData.category}
-            onValueChange={handleCategoryChange}
-            disabled={loading}
-          >
-            <SelectTrigger className="w-full text-sm h-10 border-emerald-200 bg-white/80 backdrop-blur-sm focus:ring-2 focus:ring-emerald-500">
-              <SelectValue placeholder="Select category" />
-            </SelectTrigger>
-            <SelectContent className="rounded-lg shadow-lg">
-              <SelectItem value="pizza">Pizza</SelectItem>
-              <SelectItem value="burgers">Burgers</SelectItem>
-              <SelectItem value="pasta">Pasta</SelectItem>
-              <SelectItem value="salads">Salads</SelectItem>
-              <SelectItem value="drinks">Drinks</SelectItem>
-              <SelectItem value="desserts">Desserts</SelectItem>
-            </SelectContent>
-          </Select>
+          {categoriesLoading ? (
+            <div className="w-full px-3 py-2 text-sm border border-emerald-200 rounded-lg bg-white/80 text-emerald-700">
+              Loading categories...
+            </div>
+          ) : categories.length === 0 ? (
+            <div className="w-full px-3 py-2 text-sm border border-red-200 rounded-lg bg-red-50/50 text-red-700">
+              No categories available. Please add one first.
+            </div>
+          ) : (
+            <Select
+              value={formData.category}
+              onValueChange={handleCategoryChange}
+              disabled={loading}
+            >
+              <SelectTrigger className="w-full text-sm h-10 border-emerald-200 bg-white/80 backdrop-blur-sm focus:ring-2 focus:ring-emerald-500 relative">
+                <SelectValue placeholder="Select category" />
+                <ChevronDown className="h-4 w-4 absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none" />
+              </SelectTrigger>
+              <SelectContent className="rounded-lg shadow-lg">
+                {categories.map((cat) => (
+                  <SelectItem key={cat._id} value={cat.name}>
+                    {cat.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
         </div>
 
         <div>

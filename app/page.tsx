@@ -6,7 +6,7 @@ import Banner from '@/components/Banner';
 import CategoryFilter from '@/components/CategoryFilter';
 import FoodMenu from '@/components/FoodMenu';
 import Footer from '@/components/Footer';
-import { Category, FoodItem, categories as staticCategories, mongoFoodToFoodItem, MongoFoodItem } from '@/lib/data';
+import { Category, FoodItem, categories as staticCategories, mongoFoodToFoodItem, MongoFoodItem, mongoCategoriesToFrontendCategories, setCategoryMap, MongoCategoryItem } from '@/lib/data';
 
 export default function Home() {
   const [categories, setCategories] = useState<Category[]>([]);
@@ -19,9 +19,28 @@ export default function Home() {
   const [showOrderForm, setShowOrderForm] = useState(false);
 
   useEffect(() => {
-    setCategories(staticCategories);
+    fetchCategories();
     fetchFoodItems();
   }, []);
+
+  const fetchCategories = async () => {
+    try {
+      const response = await fetch('/api/categories');
+      const data = await response.json();
+
+      if (data.success && data.data) {
+        const mongoCategories: MongoCategoryItem[] = data.data;
+        const frontendCategories = mongoCategoriesToFrontendCategories(mongoCategories);
+        setCategoryMap(mongoCategories);
+        setCategories(frontendCategories);
+      } else {
+        setCategories(staticCategories);
+      }
+    } catch (error) {
+      console.error('Failed to fetch categories:', error);
+      setCategories(staticCategories);
+    }
+  };
 
   const fetchFoodItems = async () => {
     try {
@@ -92,7 +111,6 @@ export default function Home() {
       <Navbar />
       <Banner onOrderClick={() => setShowOrderForm(true)} onViewMenuClick={handleViewMenu} />
       <CategoryFilter
-        categories={categories}
         selectedCategory={selectedCategory}
         onSelectCategory={handleCategorySelect}
       />

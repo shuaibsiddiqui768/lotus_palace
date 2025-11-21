@@ -1,32 +1,49 @@
 'use client';
 
-import React, { useRef } from 'react';
-import { Category } from '@/lib/data';
+import React, { useRef, useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
+interface Category {
+  _id: string;
+  name: string;
+  slug: string;
+  image?: string;
+  description?: string;
+}
+
 interface CategoryFilterProps {
-  categories: Category[];
   selectedCategory: string;
   onSelectCategory: (slug: string) => void;
 }
 
-const categoryImages: Record<string, string> = {
-  all: 'https://images.pexels.com/photos/1410235/pexels-photo-1410235.jpeg?auto=compress&cs=tinysrgb&w=400',
-  pizza: 'https://images.pexels.com/photos/1146760/pexels-photo-1146760.jpeg?auto=compress&cs=tinysrgb&w=400',
-  burgers: 'https://images.pexels.com/photos/1639557/pexels-photo-1639557.jpeg?auto=compress&cs=tinysrgb&w=400',
-  pasta: 'https://images.pexels.com/photos/1279330/pexels-photo-1279330.jpeg?auto=compress&cs=tinysrgb&w=400',
-  salads: 'https://images.pexels.com/photos/2097090/pexels-photo-2097090.jpeg?auto=compress&cs=tinysrgb&w=400',
-  drinks: 'https://images.pexels.com/photos/1337825/pexels-photo-1337825.jpeg?auto=compress&cs=tinysrgb&w=400',
-  desserts: 'https://images.pexels.com/photos/291528/pexels-photo-291528.jpeg?auto=compress&cs=tinysrgb&w=400',
-};
+const DEFAULT_IMAGE = 'https://images.pexels.com/photos/1410235/pexels-photo-1410235.jpeg?auto=compress&cs=tinysrgb&w=400';
 
 export default function CategoryFilter({
-  categories,
   selectedCategory,
   onSelectCategory,
 }: CategoryFilterProps) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
+  const fetchCategories = async () => {
+    try {
+      const response = await fetch('/api/categories');
+      const data = await response.json();
+      if (data.success) {
+        setCategories(data.data);
+      }
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const scrollByAmount = (dir: 'left' | 'right') => {
     const el = scrollContainerRef.current;
@@ -71,65 +88,72 @@ export default function CategoryFilter({
           <div
             ref={scrollContainerRef}
             className={cn(
-              // Layout and spacing
               'flex gap-6 sm:gap-7 md:gap-8 lg:gap-10 overflow-x-auto scroll-smooth',
-              'py-4 px-2 sm:px-10', // extra horizontal padding so arrows don't cover items
+              'py-4 px-2 sm:px-10',
               'min-h-[200px] sm:min-h-[220px]',
-              // Hide scrollbar
               'scrollbar-hide [scrollbar-width:none] [ms-overflow-style:none] [&::-webkit-scrollbar]:hidden',
-              // Snap behavior
               'snap-x snap-mandatory'
             )}
           >
-            {categories.map((category) => {
-              const isSelected = selectedCategory === category.slug;
-              const imageUrl = categoryImages[category.slug] || categoryImages.all;
+            {loading ? (
+              <div className="flex items-center justify-center w-full">
+                <p className="text-emerald-700">Loading categories...</p>
+              </div>
+            ) : categories.length === 0 ? (
+              <div className="flex items-center justify-center w-full">
+                <p className="text-emerald-700">No categories available</p>
+              </div>
+            ) : (
+              categories.map((category) => {
+                const isSelected = selectedCategory === category.slug;
+                const imageUrl = category.image || DEFAULT_IMAGE;
 
-              return (
-                <button
-                  key={category.id}
-                  onClick={() => onSelectCategory(category.slug)}
-                  className={cn(
-                    'flex flex-col items-center gap-3 flex-shrink-0 transition-all duration-300 group',
-                    'snap-start',
-                    'p-3 sm:p-4 rounded-2xl',
-                    isSelected
-                      ? 'bg-gradient-to-br from-emerald-50 to-lime-50 shadow-md'
-                      : 'hover:bg-emerald-50/60 hover:shadow-sm'
-                  )}
-                  style={{ width: 'clamp(130px, 30vw, 190px)' }}
-                >
-                  <div
+                return (
+                  <button
+                    key={category._id}
+                    onClick={() => onSelectCategory(category.slug)}
                     className={cn(
-                      'relative h-28 w-28 sm:h-32 sm:w-32 md:h-36 md:w-36 rounded-full overflow-hidden transition-all duration-300 flex-shrink-0',
+                      'flex flex-col items-center gap-3 flex-shrink-0 transition-all duration-300 group',
+                      'snap-start',
+                      'p-3 sm:p-4 rounded-2xl',
                       isSelected
-                        ? 'ring-4 ring-emerald-600 shadow-2xl shadow-emerald-200/60 scale-110'
-                        : 'ring-2 ring-emerald-200 shadow-lg hover:ring-emerald-400 hover:shadow-xl hover:scale-105'
+                        ? 'bg-gradient-to-br from-emerald-50 to-lime-50 shadow-md'
+                        : 'hover:bg-emerald-50/60 hover:shadow-sm'
                     )}
+                    style={{ width: 'clamp(130px, 30vw, 190px)' }}
                   >
-                    <img
-                      src={imageUrl}
-                      alt={category.name}
-                      className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-                    />
                     <div
                       className={cn(
-                        'absolute inset-0 transition-opacity duration-300',
-                        isSelected ? 'bg-emerald-600/10' : 'group-hover:bg-emerald-500/5'
+                        'relative h-28 w-28 sm:h-32 sm:w-32 md:h-36 md:w-36 rounded-full overflow-hidden transition-all duration-300 flex-shrink-0',
+                        isSelected
+                          ? 'ring-4 ring-emerald-600 shadow-2xl shadow-emerald-200/60 scale-110'
+                          : 'ring-2 ring-emerald-200 shadow-lg hover:ring-emerald-400 hover:shadow-xl hover:scale-105'
                       )}
-                    />
-                  </div>
-                  <span
-                    className={cn(
-                      'text-sm sm:text-base font-semibold text-center transition-colors duration-300 whitespace-nowrap px-2',
-                      isSelected ? 'text-emerald-700' : 'text-slate-700 group-hover:text-emerald-600'
-                    )}
-                  >
-                    {category.name}
-                  </span>
-                </button>
-              );
-            })}
+                    >
+                      <img
+                        src={imageUrl}
+                        alt={category.name}
+                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                      />
+                      <div
+                        className={cn(
+                          'absolute inset-0 transition-opacity duration-300',
+                          isSelected ? 'bg-emerald-600/10' : 'group-hover:bg-emerald-500/5'
+                        )}
+                      />
+                    </div>
+                    <span
+                      className={cn(
+                        'text-sm sm:text-base font-semibold text-center transition-colors duration-300 whitespace-nowrap px-2',
+                        isSelected ? 'text-emerald-700' : 'text-slate-700 group-hover:text-emerald-600'
+                      )}
+                    >
+                      {category.name}
+                    </span>
+                  </button>
+                );
+              })
+            )}
           </div>
         </div>
       </div>
