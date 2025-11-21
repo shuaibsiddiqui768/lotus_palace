@@ -17,8 +17,6 @@ interface CategoryFilterProps {
   onSelectCategory: (slug: string) => void;
 }
 
-const DEFAULT_IMAGE = 'https://images.pexels.com/photos/1410235/pexels-photo-1410235.jpeg?auto=compress&cs=tinysrgb&w=400';
-
 export default function CategoryFilter({
   selectedCategory,
   onSelectCategory,
@@ -36,7 +34,14 @@ export default function CategoryFilter({
       const response = await fetch('/api/categories');
       const data = await response.json();
       if (data.success) {
-        setCategories(data.data);
+        // Add "All" category at the beginning
+        const allCategory = {
+          _id: 'all',
+          name: 'All',
+          slug: 'all',
+          // No image - will display icon
+        };
+        setCategories([allCategory, ...data.data]);
       }
     } catch (error) {
       console.error('Error fetching categories:', error);
@@ -106,7 +111,6 @@ export default function CategoryFilter({
             ) : (
               categories.map((category) => {
                 const isSelected = selectedCategory === category.slug;
-                const imageUrl = category.image || DEFAULT_IMAGE;
 
                 return (
                   <button
@@ -122,26 +126,42 @@ export default function CategoryFilter({
                     )}
                     style={{ width: 'clamp(130px, 30vw, 190px)' }}
                   >
-                    <div
-                      className={cn(
-                        'relative h-28 w-28 sm:h-32 sm:w-32 md:h-36 md:w-36 rounded-full overflow-hidden transition-all duration-300 flex-shrink-0',
-                        isSelected
-                          ? 'ring-4 ring-emerald-600 shadow-2xl shadow-emerald-200/60 scale-110'
-                          : 'ring-2 ring-emerald-200 shadow-lg hover:ring-emerald-400 hover:shadow-xl hover:scale-105'
-                      )}
-                    >
-                      <img
-                        src={imageUrl}
-                        alt={category.name}
-                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-                      />
+                    {category.image ? (
                       <div
                         className={cn(
-                          'absolute inset-0 transition-opacity duration-300',
-                          isSelected ? 'bg-emerald-600/10' : 'group-hover:bg-emerald-500/5'
+                          'relative h-28 w-28 sm:h-32 sm:w-32 md:h-36 md:w-36 rounded-full overflow-hidden transition-all duration-300 flex-shrink-0',
+                          isSelected
+                            ? 'ring-4 ring-emerald-600 shadow-2xl shadow-emerald-200/60 scale-110'
+                            : 'ring-2 ring-emerald-200 shadow-lg hover:ring-emerald-400 hover:shadow-xl hover:scale-105'
                         )}
-                      />
-                    </div>
+                      >
+                        <img
+                          src={category.image}
+                          alt={category.name}
+                          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                        />
+                        <div
+                          className={cn(
+                            'absolute inset-0 transition-opacity duration-300',
+                            isSelected ? 'bg-emerald-600/10' : 'group-hover:bg-emerald-500/5'
+                          )}
+                        />
+                      </div>
+                    ) : (
+                      <div
+                        className={cn(
+                          'flex items-center justify-center h-28 w-28 sm:h-32 sm:w-32 md:h-36 md:w-36 rounded-full transition-all duration-300 flex-shrink-0',
+                          'bg-gradient-to-br from-emerald-100 to-lime-100',
+                          isSelected
+                            ? 'ring-4 ring-emerald-600 shadow-2xl shadow-emerald-200/60 scale-110'
+                            : 'ring-2 ring-emerald-200 shadow-lg hover:ring-emerald-400 hover:shadow-xl hover:scale-105'
+                        )}
+                      >
+                        <span className="text-3xl sm:text-4xl">
+                          {category.slug === 'all' ? '🍽️' : '📷'}
+                        </span>
+                      </div>
+                    )}
                     <span
                       className={cn(
                         'text-sm sm:text-base font-semibold text-center transition-colors duration-300 whitespace-nowrap px-2',
