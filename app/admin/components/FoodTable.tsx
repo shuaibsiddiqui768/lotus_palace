@@ -231,12 +231,29 @@ export function FoodTable({ refreshTrigger }: { refreshTrigger?: number }) {
         return;
       }
 
+      // Check if image is being changed or removed
+      const oldImage = editingItem.image;
+      const newImage = editFormData.image.trim();
+
+      // If image is being changed or removed, delete the old image from Cloudinary
+      if (oldImage && oldImage !== newImage) {
+        try {
+          await fetch(`/api/upload?url=${encodeURIComponent(oldImage)}`, {
+            method: 'DELETE',
+          });
+          console.log('Old food item image deleted from Cloudinary');
+        } catch (imageError) {
+          console.error('Failed to delete old food item image from Cloudinary:', imageError);
+          // Don't fail the whole operation if image deletion fails
+        }
+      }
+
       const payload = {
         name: editFormData.name.trim(),
         category: editFormData.category,
         price: parsedPrice,
         description: editFormData.description.trim(),
-        image: editFormData.image.trim(),
+        image: newImage,
         spicy: editFormData.spicy,
         vegetarian: editFormData.vegetarian,
         available: editFormData.available,
@@ -311,14 +328,17 @@ export function FoodTable({ refreshTrigger }: { refreshTrigger?: number }) {
     setDeleting(id);
     try {
       console.log(`Deleting food item with ID: ${id}`);
-      
+
+      // Get the item to check if it has an image
+      const itemToDelete = foodItems.find(item => item._id === id);
+
       const response = await fetch(`/api/food/${id}`, {
         method: 'DELETE',
         cache: 'no-store' as RequestCache,
       });
 
       console.log('Delete response status:', response.status);
-      
+
       if (!response.ok) {
         const errorText = await response.text();
         console.error('Error response:', errorText);
@@ -330,6 +350,19 @@ export function FoodTable({ refreshTrigger }: { refreshTrigger?: number }) {
 
       if (!data.success) {
         throw new Error(data.message || 'Failed to delete food item');
+      }
+
+      // Delete the food item image from Cloudinary if it exists
+      if (itemToDelete?.image) {
+        try {
+          await fetch(`/api/upload?url=${encodeURIComponent(itemToDelete.image)}`, {
+            method: 'DELETE',
+          });
+          console.log('Food item image deleted from Cloudinary');
+        } catch (imageError) {
+          console.error('Failed to delete food item image from Cloudinary:', imageError);
+          // Don't fail the whole operation if image deletion fails
+        }
       }
 
       toast({

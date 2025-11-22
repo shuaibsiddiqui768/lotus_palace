@@ -96,8 +96,6 @@ async function createAdmin() {
 
     await admin.save();
     console.log('Admin user created successfully!');
-    console.log('Username: admin');
-    console.log('Password: admin123');
     console.log('Role: superadmin');
 
   } catch (error) {

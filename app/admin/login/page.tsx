@@ -108,7 +108,7 @@ export default function AdminLoginPage() {
 
   if (isCheckingSession) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-[#e4f2e9] via-white to-[#f7efe6]">
+      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-[#e4f2e9] via-white to-[#d1fae5]">
         <div className="flex items-center gap-2 text-emerald-700">
           <Loader2 className="h-5 w-5 animate-spin" />
           <span>Checking session...</span>
@@ -118,7 +118,7 @@ export default function AdminLoginPage() {
   }
 
   return (
-    <div className="flex items-center justify-center px-4 py-16 min-h-screen bg-gradient-to-br from-[#e4f2e9] via-white to-[#f7efe6]">
+    <div className="flex items-center justify-center px-4 py-16 min-h-screen bg-gradient-to-br from-[#e4f2e9] via-white to-[#d1fae5]">
       <div className="w-full max-w-md bg-white/80 backdrop-blur-lg border border-emerald-100 shadow-2xl rounded-3xl p-10 space-y-6 relative overflow-hidden">
 
         {/* Decorative Lotus Theme Glow */}

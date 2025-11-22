@@ -175,6 +175,9 @@ export function CategoryManager({ onCategoryChange }: { onCategoryChange?: () =>
 
     setLoading(true);
     try {
+      // First, get the category to check if it has an image
+      const categoryToDelete = categories.find(cat => cat.slug === slug);
+
       const response = await fetch(`/api/categories/${slug}`, {
         method: 'DELETE',
       });
@@ -183,6 +186,19 @@ export function CategoryManager({ onCategoryChange }: { onCategoryChange?: () =>
 
       if (!response.ok) {
         throw new Error(data.message || 'Failed to delete category');
+      }
+
+      // Delete the category image from Cloudinary if it exists
+      if (categoryToDelete?.image) {
+        try {
+          await fetch(`/api/upload?url=${encodeURIComponent(categoryToDelete.image)}`, {
+            method: 'DELETE',
+          });
+          console.log('Category image deleted from Cloudinary');
+        } catch (imageError) {
+          console.error('Failed to delete category image from Cloudinary:', imageError);
+          // Don't fail the whole operation if image deletion fails
+        }
       }
 
       toast({

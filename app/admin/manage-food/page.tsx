@@ -40,7 +40,7 @@ export default function ManageFood() {
         </div>
 
         {/* Content */}
-        <div className="grid grid-cols-1 lg:grid-cols-10 gap-6 lg:gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
           <div className="lg:col-span-6 space-y-6">
             <CategoryManager onCategoryChange={handleCategoryChange} />
             <div className="rounded-2xl border border-emerald-100 bg-gradient-to-br from-white to-emerald-50/30 backdrop-blur-sm shadow-lg p-4 sm:p-5">
@@ -54,7 +54,7 @@ export default function ManageFood() {
             </div>
           </div>
 
-          <div className="lg:col-span-4">
+          <div className="lg:col-span-6">
             <div className="rounded-2xl border border-emerald-100 bg-gradient-to-br from-white to-emerald-50/30 backdrop-blur-sm shadow-lg p-4 sm:p-5">
               <div className="mb-3 pb-3 border-b border-emerald-100 flex items-center justify-between">
                 <h2 className="text-lg font-bold bg-gradient-to-r from-emerald-700 to-lime-500 bg-clip-text text-transparent">
