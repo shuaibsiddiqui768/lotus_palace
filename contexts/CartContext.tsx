@@ -222,6 +222,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       price: item.price,
       image_url: item.image_url,
       category_id: item.category_id,
+      category: item.category,
       is_available: item.is_available,
       created_at: item.created_at,
       updated_at: item.updated_at,

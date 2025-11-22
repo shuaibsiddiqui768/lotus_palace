@@ -31,8 +31,10 @@ export default function CategoryFilter({
 
   const fetchCategories = async () => {
     try {
+      console.log('CategoryFilter: Fetching categories...');
       const response = await fetch('/api/categories');
       const data = await response.json();
+      console.log('CategoryFilter: Categories response:', data);
       if (data.success) {
         // Add "All" category at the beginning
         const allCategory = {
@@ -42,9 +44,12 @@ export default function CategoryFilter({
           // No image - will display icon
         };
         setCategories([allCategory, ...data.data]);
+        console.log('CategoryFilter: Set categories:', [allCategory, ...data.data]);
+      } else {
+        console.error('CategoryFilter: API returned success=false');
       }
     } catch (error) {
-      console.error('Error fetching categories:', error);
+      console.error('CategoryFilter: Error fetching categories:', error);
     } finally {
       setLoading(false);
     }

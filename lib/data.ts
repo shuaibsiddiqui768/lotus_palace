@@ -14,6 +14,7 @@ export interface FoodItem {
   price: number;
   image_url: string | null;
   category_id: string;
+  category: string; // Add category name for filtering
   is_available: boolean;
   created_at: string;
   updated_at: string;
@@ -81,6 +82,7 @@ export function mongoFoodToFoodItem(mongoFood: MongoFoodItem): FoodItem {
     price: mongoFood.price,
     image_url: mongoFood.image || null,
     category_id: categoryId,
+    category: mongoFood.category, // Store original category name
     is_available: mongoFood.available,
     created_at: mongoFood.createdAt,
     updated_at: mongoFood.updatedAt,
@@ -181,6 +183,16 @@ export const categories: Category[] = [
   },
 ];
 
+// Category name mapping for static data
+const categoryNameMap: Record<string, string> = {
+  '2': 'Pizza',
+  '3': 'Burgers',
+  '4': 'Pasta',
+  '5': 'Salads',
+  '6': 'Drinks',
+  '7': 'Desserts',
+};
+
 export const foodItems: FoodItem[] = [
   {
     id: '1',
@@ -189,6 +201,7 @@ export const foodItems: FoodItem[] = [
     price: 499,
     image_url: 'https://images.pexels.com/photos/1146760/pexels-photo-1146760.jpeg?auto=compress&cs=tinysrgb&w=800',
     category_id: '2',
+    category: 'Pizza',
     is_available: true,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
@@ -200,6 +213,7 @@ export const foodItems: FoodItem[] = [
     price: 599,
     image_url: 'https://images.pexels.com/photos/2147491/pexels-photo-2147491.jpeg?auto=compress&cs=tinysrgb&w=800',
     category_id: '2',
+    category: 'Pizza',
     is_available: true,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
@@ -211,6 +225,7 @@ export const foodItems: FoodItem[] = [
     price: 399,
     image_url: 'https://images.pexels.com/photos/1639557/pexels-photo-1639557.jpeg?auto=compress&cs=tinysrgb&w=800',
     category_id: '3',
+    category: 'Burgers',
     is_available: true,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
@@ -222,6 +237,7 @@ export const foodItems: FoodItem[] = [
     price: 499,
     image_url: 'https://images.pexels.com/photos/1556698/pexels-photo-1556698.jpeg?auto=compress&cs=tinysrgb&w=800',
     category_id: '3',
+    category: 'Burgers',
     is_available: true,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
@@ -233,6 +249,7 @@ export const foodItems: FoodItem[] = [
     price: 449,
     image_url: 'https://images.pexels.com/photos/1279330/pexels-photo-1279330.jpeg?auto=compress&cs=tinysrgb&w=800',
     category_id: '4',
+    category: 'Pasta',
     is_available: true,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
@@ -244,6 +261,7 @@ export const foodItems: FoodItem[] = [
     price: 10.99,
     image_url: 'https://images.pexels.com/photos/1279330/pexels-photo-1279330.jpeg?auto=compress&cs=tinysrgb&w=800',
     category_id: '4',
+    category: 'Pasta',
     is_available: true,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
@@ -255,6 +273,7 @@ export const foodItems: FoodItem[] = [
     price: 8.99,
     image_url: 'https://images.pexels.com/photos/2097090/pexels-photo-2097090.jpeg?auto=compress&cs=tinysrgb&w=800',
     category_id: '5',
+    category: 'Salads',
     is_available: true,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
@@ -266,6 +285,7 @@ export const foodItems: FoodItem[] = [
     price: 9.99,
     image_url: 'https://images.pexels.com/photos/1213710/pexels-photo-1213710.jpeg?auto=compress&cs=tinysrgb&w=800',
     category_id: '5',
+    category: 'Salads',
     is_available: true,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
@@ -277,6 +297,7 @@ export const foodItems: FoodItem[] = [
     price: 4.99,
     image_url: 'https://images.pexels.com/photos/1337825/pexels-photo-1337825.jpeg?auto=compress&cs=tinysrgb&w=800',
     category_id: '6',
+    category: 'Drinks',
     is_available: true,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
@@ -288,6 +309,7 @@ export const foodItems: FoodItem[] = [
     price: 5.99,
     image_url: 'https://images.pexels.com/photos/312418/pexels-photo-312418.jpeg?auto=compress&cs=tinysrgb&w=800',
     category_id: '6',
+    category: 'Drinks',
     is_available: true,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
@@ -299,6 +321,7 @@ export const foodItems: FoodItem[] = [
     price: 7.99,
     image_url: 'https://images.pexels.com/photos/291528/pexels-photo-291528.jpeg?auto=compress&cs=tinysrgb&w=800',
     category_id: '7',
+    category: 'Desserts',
     is_available: true,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
@@ -310,6 +333,7 @@ export const foodItems: FoodItem[] = [
     price: 8.99,
     image_url: 'https://images.pexels.com/photos/6880219/pexels-photo-6880219.jpeg?auto=compress&cs=tinysrgb&w=800',
     category_id: '7',
+    category: 'Desserts',
     is_available: true,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),

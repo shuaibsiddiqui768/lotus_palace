@@ -67,7 +67,7 @@ export default function Home() {
 
   useEffect(() => {
     filterItems();
-  }, [selectedCategory, searchQuery, foodItems]);
+  }, [selectedCategory, searchQuery, foodItems, categories]);
 
   const filterItems = () => {
     let filtered = [...foodItems];
@@ -75,7 +75,10 @@ export default function Home() {
     if (selectedCategory !== 'all') {
       const category = categories.find((cat) => cat.slug === selectedCategory);
       if (category) {
-        filtered = filtered.filter((item) => item.category_id === category.id);
+        // Filter by category name directly
+        filtered = filtered.filter((item) =>
+          item.category?.toLowerCase() === category.name.toLowerCase()
+        );
       }
     }
 
@@ -96,6 +99,7 @@ export default function Home() {
   };
 
   const handleCategorySelect = (slug: string) => {
+    console.log('Category selected:', slug);
     setSelectedCategory(slug);
   };
 
