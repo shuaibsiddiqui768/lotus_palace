@@ -51,7 +51,7 @@ export function Header() {
 
   const loadNotifications = useCallback(async () => {
     try {
-      const response = await fetch('/api/orders?status=pending', {
+      const response = await fetch('/api/orders?status=confirmed', {
         cache: 'no-store' as RequestCache,
       });
       if (!response.ok || !isMountedRef.current) return;
@@ -129,6 +129,29 @@ export function Header() {
       isMountedRef.current = false;
       window.clearInterval(intervalId);
     };
+  }, [loadNotifications]);
+
+  // Listen for instant notification triggers from new orders
+  useEffect(() => {
+    const handleStorage = (e: StorageEvent) => {
+      if (e.key === 'admin-new-order' && e.newValue && isMountedRef.current) {
+        loadNotifications();
+        window.localStorage.removeItem('admin-new-order');
+      }
+    };
+    window.addEventListener('storage', handleStorage);
+    return () => window.removeEventListener('storage', handleStorage);
+  }, [loadNotifications]);
+
+  // Listen for order status changes to refresh notifications
+  useEffect(() => {
+    const handleOrderStatusChange = () => {
+      if (isMountedRef.current) {
+        loadNotifications();
+      }
+    };
+    window.addEventListener('admin-order-status-changed', handleOrderStatusChange);
+    return () => window.removeEventListener('admin-order-status-changed', handleOrderStatusChange);
   }, [loadNotifications]);
 
   const formatOrderType = (value: string) => {

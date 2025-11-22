@@ -540,9 +540,15 @@ export function OrdersTable({ orders, onStatusUpdate }: OrdersTableProps) {
                   <td className="py-3 px-4 text-gray-900 font-medium text-sm">
                     {/* Desktop estimated time display */}
                     {order.estimatedTime && order.status !== 'completed' && order.status !== 'cancelled' && countdownTime[order._id] !== undefined ? (
-                      <span className="text-orange-600 font-semibold">
-                        {Math.floor(countdownTime[order._id] / 60)}:{(countdownTime[order._id] % 60).toString().padStart(2, '0')}
-                      </span>
+                      countdownTime[order._id] > 0 ? (
+                        <span className="text-orange-600 font-semibold">
+                          {Math.floor(countdownTime[order._id] / 60)}:{(countdownTime[order._id] % 60).toString().padStart(2, '0')}
+                        </span>
+                      ) : (
+                        <span className="text-red-600 font-semibold animate-pulse">
+                          Time Up - Update Needed
+                        </span>
+                      )
                     ) : (
                       order.estimatedTime ? `${order.estimatedTime} min` : '-'
                     )}
@@ -699,9 +705,15 @@ export function OrdersTable({ orders, onStatusUpdate }: OrdersTableProps) {
                   <p className="text-gray-500">Est. Time</p>
                   <p className="font-medium">
                     {order.estimatedTime && order.status !== 'completed' && order.status !== 'cancelled' && countdownTime[order._id] !== undefined ? (
-                      <span className="text-orange-600 font-semibold">
-                        {Math.floor(countdownTime[order._id] / 60)}:{(countdownTime[order._id] % 60).toString().padStart(2, '0')}
-                      </span>
+                      countdownTime[order._id] > 0 ? (
+                        <span className="text-orange-600 font-semibold">
+                          {Math.floor(countdownTime[order._id] / 60)}:{(countdownTime[order._id] % 60).toString().padStart(2, '0')}
+                        </span>
+                      ) : (
+                        <span className="text-red-600 font-semibold animate-pulse">
+                          Time Up - Update Needed
+                        </span>
+                      )
                     ) : (
                       order.estimatedTime ? `${order.estimatedTime} min` : '-'
                     )}

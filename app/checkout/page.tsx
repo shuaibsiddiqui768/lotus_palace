@@ -172,6 +172,11 @@ export default function CheckoutPage() {
       console.log('Order created successfully:', orderResult.data);
       const orderId = orderResult.data._id;
 
+      // Trigger instant notification for admin
+      if (typeof window !== 'undefined') {
+        window.localStorage.setItem('admin-new-order', Date.now().toString());
+      }
+
       const paymentPayload = {
         createPayment: true,
         payment: {

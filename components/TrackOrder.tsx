@@ -35,8 +35,8 @@ interface Order {
   customerName: string;
   customerPhone: string;
   customerEmail?: string;
-  orderType: 'dine-in' | 'takeaway' | 'delivery';
-  tableNumber?: string;
+  orderType: 'Rooms';
+  roomNumber: string;
   deliveryAddress?: string;
   deliveryNotes?: string;
   payment?: PaymentInfo;
@@ -88,6 +88,7 @@ export default function TrackOrder({ userId, initialPhone, onBack }: TrackOrderP
   const [customerPhone, setCustomerPhone] = useState(initialPhone ?? '');
   const [userSelectedFilter, setUserSelectedFilter] = useState(false);
   const [countdownTime, setCountdownTime] = useState<{ [orderId: string]: number }>({});
+  const [isSummaryExpanded, setIsSummaryExpanded] = useState(true);
 
   useEffect(() => {
     if (initialPhone) {
@@ -339,21 +340,12 @@ export default function TrackOrder({ userId, initialPhone, onBack }: TrackOrderP
                 day: 'numeric',
               })}</span></div>
               <div class="details-row"><span class="label">Type:</span><span>${
-                order.orderType.charAt(0).toUpperCase() + order.orderType.slice(1)
+                order.orderType
               }</span></div>
+              <div class="details-row"><span class="label">Room:</span><span>${order.roomNumber}</span></div>
               <div class="details-row"><span class="label">Payment:</span><span>${
                 order.payment?.method || 'N/A'
               } (${order.payment?.status || 'N/A'})</span></div>
-              ${
-                order.orderType === 'dine-in'
-                  ? `<div class="details-row"><span class="label">Table:</span><span>${order.tableNumber}</span></div>`
-                  : ''
-              }
-              ${
-                order.orderType === 'delivery'
-                  ? `<div class="details-row"><span class="label">Address:</span><span>${order.deliveryAddress}</span></div>`
-                  : ''
-              }
             </div>
             <div class="section">
               <h3>Items</h3>
@@ -536,7 +528,29 @@ export default function TrackOrder({ userId, initialPhone, onBack }: TrackOrderP
             </div>
 
             {primaryOrder && (
-              <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
+              <>
+                <div className="flex items-center justify-between mb-3 sm:mb-4">
+                  <h2 className="text-lg sm:text-xl font-semibold text-emerald-900">
+                    Order Summary
+                  </h2>
+                  <Button
+                    onClick={() => setIsSummaryExpanded(!isSummaryExpanded)}
+                    variant="ghost"
+                    size="sm"
+                    className="flex items-center space-x-1 text-emerald-700 hover:text-emerald-900 hover:bg-emerald-50"
+                  >
+                    <span className="text-sm">
+                      {isSummaryExpanded ? 'Collapse' : 'Expand'}
+                    </span>
+                    {isSummaryExpanded ? (
+                      <ChevronUp className="h-4 w-4" />
+                    ) : (
+                      <ChevronDown className="h-4 w-4" />
+                    )}
+                  </Button>
+                </div>
+                {isSummaryExpanded && (
+                  <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-4">
                 <div className="bg-emerald-50/70 border border-emerald-100 rounded-2xl p-3 sm:p-4">
                   <p className="text-[11px] font-semibold uppercase tracking-wide text-emerald-700">
                     Guest
@@ -561,26 +575,24 @@ export default function TrackOrder({ userId, initialPhone, onBack }: TrackOrderP
                   <p className="text-sm text-emerald-900 mt-1 capitalize">
                     {primaryOrder.orderType}
                   </p>
-                  {primaryOrder.orderType === 'dine-in' &&
-                    primaryOrder.tableNumber && (
-                      <p className="text-xs sm:text-sm text-emerald-900/75">
-                        Table {primaryOrder.tableNumber}
-                      </p>
-                    )}
-                  {primaryOrder.orderType === 'delivery' &&
-                    primaryOrder.deliveryAddress && (
-                      <p className="text-[11px] text-emerald-900/70 line-clamp-2">
-                        {primaryOrder.deliveryAddress}
-                      </p>
-                    )}
-                  {primaryOrder.deliveryNotes && (
-                    <p className="text-[11px] text-emerald-900/60 mt-1 line-clamp-2">
-                      {primaryOrder.deliveryNotes}
-                    </p>
-                  )}
+                  <p className="text-xs sm:text-sm text-emerald-900/75">
+                    Room {primaryOrder.roomNumber}
+                  </p>
                 </div>
 
-                <div className="bg-emerald-50/70 border border-emerald-100 rounded-2xl p-3 sm:p-4 sm:col-span-2 md:col-span-1">
+                <div className="bg-emerald-50/70 border border-emerald-100 rounded-2xl p-3 sm:p-4">
+                  <p className="text-[11px] font-semibold uppercase tracking-wide text-emerald-700">
+                    Contact for queries
+                  </p>
+                  <p className="text-sm text-emerald-900 mt-1">
+                    {process.env.NEXT_PUBLIC_ADMIN_PHONE_NUMBER}
+                  </p>
+                  <p className="text-[11px] text-emerald-900/70">
+                    Call this number for any queries
+                  </p>
+                </div>
+
+                <div className="bg-emerald-50/70 border border-emerald-100 rounded-2xl p-3 sm:p-4">
                   <p className="text-[11px] font-semibold uppercase tracking-wide text-emerald-700">
                     Overview
                   </p>
@@ -594,7 +606,9 @@ export default function TrackOrder({ userId, initialPhone, onBack }: TrackOrderP
                     </p>
                   </div>
                 </div>
-              </div>
+                  </div>
+                )}
+              </>
             )}
           </div>
         </div>
@@ -741,7 +755,7 @@ export default function TrackOrder({ userId, initialPhone, onBack }: TrackOrderP
                             size="sm"
                             onClick={() => toggleOrderExpansion(order._id)}
                             className="flex items-center gap-1 text-[11px] sm:text-xs border-emerald-200 text-emerald-800 hover:bg-emerald-50"
-                          >
+                           >
                             {expandedOrders[order._id] ? 'Hide' : 'View'} details
                             {expandedOrders[order._id] ? (
                               <ChevronUp className="h-3 w-3 sm:h-4 sm:w-4" />
@@ -857,7 +871,7 @@ export default function TrackOrder({ userId, initialPhone, onBack }: TrackOrderP
                   </div>
 
                   {(order.status !== 'completed' || expandedOrders[order._id]) && (
-                    <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 mb-3 sm:mb-4">
+                    <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-3 mb-3 sm:mb-4">
                       <div className="bg-white/90 border border-emerald-50 rounded-2xl p-3 sm:p-4">
                         <p className="text-[11px] font-semibold uppercase tracking-wide text-emerald-700">
                           Customer
@@ -881,21 +895,20 @@ export default function TrackOrder({ userId, initialPhone, onBack }: TrackOrderP
                         <p className="text-sm text-emerald-900 mt-1 capitalize">
                           {order.orderType}
                         </p>
-                        {order.orderType === 'dine-in' && order.tableNumber && (
-                          <p className="text-[11px] text-emerald-900/80">
-                            Table {order.tableNumber}
-                          </p>
-                        )}
-                        {order.orderType !== 'dine-in' && order.deliveryAddress && (
-                          <p className="text-[11px] text-emerald-900/70 line-clamp-2">
-                            {order.deliveryAddress}
-                          </p>
-                        )}
-                        {order.deliveryNotes && (
-                          <p className="text-[11px] text-emerald-900/60 mt-1 line-clamp-2">
-                            {order.deliveryNotes}
-                          </p>
-                        )}
+                        <p className="text-[11px] text-emerald-900/80">
+                          Room {order.roomNumber}
+                        </p>
+                      </div>
+                      <div className="bg-white/90 border border-emerald-50 rounded-2xl p-3 sm:p-4">
+                        <p className="text-[11px] font-semibold uppercase tracking-wide text-emerald-700">
+                          Contact for queries
+                        </p>
+                        <p className="text-sm text-emerald-900 mt-1">
+                          {process.env.NEXT_PUBLIC_ADMIN_PHONE_NUMBER}
+                        </p>
+                        <p className="text-[11px] text-emerald-900/70">
+                          Call for any assistance
+                        </p>
                       </div>
                       {order.payment && (
                         <div className="bg-white/90 border border-emerald-50 rounded-2xl p-3 sm:p-4">
@@ -996,7 +1009,7 @@ export default function TrackOrder({ userId, initialPhone, onBack }: TrackOrderP
                           ₹{order.total.toFixed(0)}
                         </p>
                       </div>
-                      {order.estimatedTime && (
+                      {order.estimatedTime && order.estimatedTime > 0 && (
                         <div>
                           <p className="text-xs sm:text-sm text-emerald-900/70">
                             Est. time
@@ -1004,12 +1017,17 @@ export default function TrackOrder({ userId, initialPhone, onBack }: TrackOrderP
                           <p className="text-lg sm:text-xl font-semibold text-emerald-700">
                             {order.status !== 'completed' &&
                             order.status !== 'cancelled' &&
-                            countdownTime[order._id] !== undefined
+                            countdownTime[order._id] !== undefined &&
+                            countdownTime[order._id] > 0
                               ? `${Math.floor(countdownTime[order._id] / 60)}:${(
                                   countdownTime[order._id] % 60
                                 )
                                   .toString()
                                   .padStart(2, '0')}`
+                              : order.status === 'completed' || order.status === 'cancelled'
+                              ? 'Completed'
+                              : countdownTime[order._id] === 0
+                              ? 'Time up - Waiting for update'
                               : `${order.estimatedTime} min`}
                           </p>
                         </div>

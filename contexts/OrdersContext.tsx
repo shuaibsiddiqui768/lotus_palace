@@ -8,8 +8,8 @@ interface OrderData {
   customerName: string;
   customerPhone: string;
   customerEmail: string;
-  orderType: 'dine-in' | 'takeaway' | 'delivery';
-  tableNumber?: string;
+  orderType: 'Rooms';
+  roomNumber: string;
   deliveryAddress?: string;
   deliveryNotes?: string;
   items: CartItem[];
@@ -79,7 +79,7 @@ export function OrdersProvider({ children }: { children: React.ReactNode }) {
           customerPhone: order.customerPhone,
           customerEmail: order.customerEmail || '',
           orderType: order.orderType,
-          tableNumber: order.tableNumber,
+          roomNumber: order.roomNumber,
           deliveryAddress: order.deliveryAddress,
           deliveryNotes: order.deliveryNotes,
           items: order.items,
